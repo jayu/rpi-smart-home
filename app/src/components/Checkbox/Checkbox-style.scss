@@ -1,0 +1,98 @@
+$orange : orange;
+$active : $orange;
+$white : white;
+$width: 30px;
+$height: 20px;
+
+.checkbox-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    box-sizing: initial;
+    position: relative;
+    z-index: 1;
+}
+.checkbox-container .label {
+    display: inline-block;
+    float: left;
+    margin: 0;
+    margin-left: 10px;
+    z-index: -1;
+}
+input.checkbox-btn {
+    display: none;
+}
+label.checkbox {
+
+    position: relative;
+    display: inline-block;
+    width : $width;
+    height: $height;
+    border-radius: $height/2;
+    border: 1px solid $orange;
+    box-sizing: initial;
+    margin:0;
+
+    transition: border 0.3s ease-in-out;
+    z-index: 2;
+    cursor: pointer;
+
+}
+p.label ~ label.checkbox { /* only if label text is rendered checkbox will have margin */
+    margin-right: 5%;
+}
+.state {
+    position: absolute;
+    display: inline-block;
+    width : $width;
+    height: $height;
+    box-sizing: initial;
+
+    transition: left 0.3s ease-in-out;
+    background-color: $white;
+    left : 0;
+    overflow: hidden;
+    border-radius: $height/2;
+}
+
+
+// .state::before{
+//     background-color: $accent;
+//     content: '';
+//     position: absolute;
+//     top:0;
+//     left: 0;
+//     width:0;
+//     height: $height;
+//     transition: width 0.3s ease-in-out;
+// }
+.switch {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    &:hover {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
+    background-color: $white;
+    position: absolute;
+    width: $height;
+    height: $height;
+    border-radius: 10px;
+    right: $width - $height;
+    z-index: 1;
+    transition: all 0.3s ease-in-out;
+}
+input[type="checkbox"] + span {
+    line-height: $height;
+}
+input[type="checkbox"]:checked ~ label.checkbox {
+    //border: 1px solid $accent;
+}
+// input[type="checkbox"]:checked ~ .checkbox .state::before {
+//     width:100%;
+// }
+input[type="checkbox"]:checked ~ .checkbox .switch {
+    right:0px;
+    background-color: $active;
+    //box-shadow: 0 1px 3px $accent;
+}

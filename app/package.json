@@ -1,0 +1,45 @@
+{
+  "name": "Forgotten_Scrapper",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "webpack --progress --profile --colors",
+    "watch": "webpack-dev-server --watch --hot --inline --progress --colors",
+    "dev": "webpack --watch --inline --progress --colors --display-error-details",
+    "test": "echo \"No unit tests and e2e tests yet\" && exit 1"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.15.3",
+    "babel-runtime": "^6.9.2",
+    "chart.js": "^2.6.0",
+    "es6-promise": "^4.0.5",
+    "isomorphic-fetch": "^2.2.1",
+    "react": "^15.0.2",
+    "react-chartjs-2": "^2.5.5",
+    "react-dom": "^15.0.2",
+    "react-redux": "5.0.2",
+    "react-router": "^2.8.1",
+    "redux": "^3.5.2",
+    "redux-thunk": "^2.2.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.23.1",
+    "babel-loader": "^6.3.2",
+    "babel-preset-es2015": "^6.0.15",
+    "babel-preset-react": "^6.0.15",
+    "babel-preset-stage-0": "^6.0.15",
+    "css-loader": "^0.25.0",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "file-loader": "^0.9.0",
+    "font-awesome-loader": "^1.0.0",
+    "html-webpack-plugin": "^1.6.0",
+    "node-libs-browser": "0.5.3",
+    "node-sass": "^3.10.0",
+    "resolve-url-loader": "^1.6.0",
+    "sass-loader": "^4.0.2",
+    "style-loader": "^0.13.1",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.9.6",
+    "webpack-dev-server": "1.10.1"
+  }
+}

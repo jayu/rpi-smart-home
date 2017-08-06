@@ -1,0 +1,17 @@
+import React from 'react'
+
+import CoffeeMachine from '../CoffeeMachine/CoffeeMachine-container';
+import Sockets from '../Sockets/Sockets-container';
+import Temperature from '../Temperature/Temperature-container';
+const AppView = (props) => {
+	return (
+    <div className="App">
+      <h1>Smart Home</h1>
+      <Sockets/>
+      <CoffeeMachine/>
+      <Temperature/>
+    </div>
+	)
+}
+
+export default AppView
