@@ -1,0 +1,96 @@
+.CoffeeMachine {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; }
+  .CoffeeMachine button {
+    padding: 15px;
+    font-size: 1.2rem;
+    margin: 10px; }
+.checkbox-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  box-sizing: initial;
+  position: relative;
+  z-index: 1; }
+
+.checkbox-container .label {
+  display: inline-block;
+  float: left;
+  margin: 0;
+  margin-left: 10px;
+  z-index: -1; }
+
+input.checkbox-btn {
+  display: none; }
+
+label.checkbox {
+  position: relative;
+  display: inline-block;
+  width: 30px;
+  height: 20px;
+  border-radius: 10px;
+  border: 1px solid orange;
+  box-sizing: initial;
+  margin: 0;
+  transition: border 0.3s ease-in-out;
+  z-index: 2;
+  cursor: pointer; }
+
+p.label ~ label.checkbox {
+  /* only if label text is rendered checkbox will have margin */
+  margin-right: 5%; }
+
+.state {
+  position: absolute;
+  display: inline-block;
+  width: 30px;
+  height: 20px;
+  box-sizing: initial;
+  transition: left 0.3s ease-in-out;
+  background-color: white;
+  left: 0;
+  overflow: hidden;
+  border-radius: 10px; }
+
+.switch {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  background-color: white;
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  right: 10px;
+  z-index: 1;
+  transition: all 0.3s ease-in-out; }
+  .switch:hover {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4); }
+
+input[type="checkbox"] + span {
+  line-height: 20px; }
+
+input[type="checkbox"]:checked ~ .checkbox .switch {
+  right: 0px;
+  background-color: orange; }
+.Temperature {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; }
+  .Temperature button {
+    padding: 15px;
+    font-size: 1.2rem;
+    margin: 10px; }
+.App {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center; }
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
