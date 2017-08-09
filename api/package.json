@@ -16,6 +16,6 @@
     "express": "^4.15.3",
     "express-fileupload": "^0.1.4",
     "express-ws": "^3.0.0",
-    "rpi-gpio" : "^0.8.1",
+    "rpi-gpio" : "^0.8.1"
   }
 }
