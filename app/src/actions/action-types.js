@@ -11,3 +11,7 @@ export const MSG_RECEIVED = 'MSG_RECEIVED';
 export const CHANGE_TEMPERATURE = 'CHANGE_TEMPERATURE'
 
 export const SET_TEMPERATURE_LIST = 'SET_TEMPERATURE_LIST'
+
+/* coffeeMachine actions */
+
+/* not required yet */

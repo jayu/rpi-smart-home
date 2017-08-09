@@ -27,6 +27,7 @@ module.exports = () => {
 	res.json(tempList);
     })
     api.post('/smallCoffee', (req, res) => {
+        console.log('small coffee required');
         const pinName = 'smallCoffee'
         const pinNumber = gpio.pins[pinName]
         gpio.write(pinNumber, true)
