@@ -1,11 +1,11 @@
-//const gpio = require('rpi-gpio');
-const gpio = {
-	read :  (a,b) => {b(null, true)},
-	write : (a,b,c) => {c(null)},
-	setup : (a,b,c) => {c()},
-	DIR_IN : true,
-	DIR_OUT : true
-}
+const gpio = require('rpi-gpio');
+// const gpio = {
+// 	read :  (a,b) => {b(null, true)},
+// 	write : (a,b,c) => {c(null)},
+// 	setup : (a,b,c) => {c()},
+// 	DIR_IN : true,
+// 	DIR_OUT : true
+// }
 const state = [];
 const pins = {
 	read : {
