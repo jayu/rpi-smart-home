@@ -32,7 +32,12 @@ module.exports = () => {
         const pinNumber = gpio.pins[pinName]
         gpio.write(pinNumber, true)
         .then(() => {
-            return gpio.write(pinNumber, false)
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    gpio.write(pinNumber, false)
+                    .then(resolve)
+                }, 300)
+            })
         })
         .then(() => {
             res.json({
@@ -49,7 +54,12 @@ module.exports = () => {
         const pinNumber = gpio.pins[pinName]
         gpio.write(pinNumber, true)
         .then(() => {
-            return gpio.write(pinNumber, false)
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    gpio.write(pinNumber, false)
+                    .then(resolve)
+                }, 300)
+            })
         })
         .then(() => {
             res.json({
