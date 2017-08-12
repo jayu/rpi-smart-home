@@ -8,7 +8,8 @@ const {WS, filterInactiveClients, websocketClients, sendToAll}  = require('./ws'
 const gpio      = require('./gpio')
 const {parseBoolean} = require('./utils')
 const {play, getTemp, monitorTemp} = require('./play_temperature')
-
+const {SoundPlayer} = require('./lib/sound_player.js')
+const MusicPlayer = require('./lib/music_player.js')
 monitorTemp()
 setInterval(monitorTemp, 29*60*1000)
 
