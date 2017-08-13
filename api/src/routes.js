@@ -8,8 +8,10 @@ const {WS, filterInactiveClients, websocketClients, sendToAll}  = require('./ws'
 const gpio      = require('./gpio')
 const {parseBoolean} = require('./utils')
 const {play, getTemp, monitorTemp} = require('./play_temperature')
-const {SoundPlayer} = require('./lib/sound_player.js')
 const MusicPlayer = require('./lib/music_player.js')
+
+const music_player = new MusicPlayer(path.join(__dirname, "res/music"));
+
 monitorTemp()
 setInterval(monitorTemp, 29*60*1000)
 
@@ -134,7 +136,9 @@ module.exports = () => {
             });
         })
     });
-
+    api.get('/musicPlayer/test', function (req, res) {
+        music_player._getFileInfo('YI - mowilas.mp3');
+    });
     api.ws('/', function(ws, req) {
         console.log('new ws connections');
         const socket = new WS(ws);
