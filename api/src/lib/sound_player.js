@@ -4,7 +4,10 @@ const fs = require('fs');
 
 const path = require('path');
 const { spawn, exec, execFile, fork } = require('child_process'); 
+/* 
+	TODO play with trim time
 
+*/
 class SoundPlayer {
 	constructor() {
 		this.queue = []; // {command, resolve}

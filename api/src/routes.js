@@ -139,6 +139,10 @@ module.exports = () => {
     api.get('/musicPlayer/test', function (req, res) {
         music_player._getFileInfo('trap/YI - mowilas.mp3');
     });
+    api.get('/musicPlayer/test2', function (req, res) {
+        music_player._readMusicInfo()
+        .then((info) => {console.log(info)})
+    });
     api.ws('/', function(ws, req) {
         console.log('new ws connections');
         const socket = new WS(ws);
