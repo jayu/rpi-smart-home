@@ -1,4 +1,7 @@
+'use-strict';
+
 const fs = require('fs');
+
 const path = require('path');
 const { spawn, exec, execFile, fork } = require('child_process'); 
 
@@ -7,7 +10,7 @@ class SoundPlayer {
 		this.queue = []; // {command, resolve}
 		this.currentPlaying = false;
 	}
-	_addToQueue(command) {
+	_addToQueue(command) { 
 		return new Promise((resolve, reject) => {
 			this.queue.push({command, resolve});
 			this._playNext();
@@ -27,9 +30,10 @@ class SoundPlayer {
 			const {command, resolve} = this.queue.shift();
 			const currentProcess = exec(command);
 			
-			process.stdout.pipe(currentProcess.stdout);
-
-			currentProcess.on('exit', (code) => {
+			currentProcess.stdout.pipe(process.stdout);
+			currentProcess.stderr.pipe(process.stderr);
+			currentProcess.on('exit', (code, code2) => {
+				console.log('exit code', code, code2);
 				this.currentPlaying = false;
 				self._playNext()
 			})
@@ -49,16 +53,18 @@ class SoundPlayer {
 	}
 	_joinSounds(soundArr) {
 		let command = '';
-		for (let i = 0; i < soundArr.length-2; i++) {
+		for (let i = 0; i < soundArr.length-1; i++) {
 			command += `play ${soundArr[i]} && `;
 		}
-		command += `play ${soundArr[i]}`
-		return this._addToQueue(command);
+		command += `play ${soundArr[soundArr.length-1]}`
+		
+		return command;
 	}
 	_soundToCommand(sound) {
-		const command = '';
-		if (typeof sound == Array) {
-			command = _joinSounds(sound)
+		let command = '';
+		if (sound.constructor == Array) {
+			console.log('joining sounds');
+			command = this. _joinSounds(sound)
 		}
 		else {
 			command = `play ${sound}`
@@ -66,7 +72,6 @@ class SoundPlayer {
 		return command;
 	}
 	play(sound) {
-
 		return this._addToQueue(this._soundToCommand(sound))
 	}
 

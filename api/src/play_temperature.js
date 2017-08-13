@@ -32,12 +32,12 @@ function monitorTemp() {
 function play(degree) {
 	degree = ~~degree
 	console.log(degree);
-	const basicPath = path.join(__dirname, './src/res/')
+	const basicPath = path.join(__dirname, './res/')
 	const sounds = [];
 
 	sounds.push(`${basicPath}hello.mp3`)  
 	sounds.push(`${basicPath}haha.mp3`)
-	sounds.push(`${basicPath}is.mp3 `)
+	sounds.push(`${basicPath}is.mp3`)
 
 	if (degree < 18) {
 		sounds.push(`${basicPath}less.mp3`)
@@ -55,17 +55,7 @@ function play(degree) {
 		sounds.push(`${basicPath}${9}.mp3`)	
 	}
 	sounds.push(`${basicPath}degree.mp3`)
-	console.log(sounds);
 	SoundPlayer.play(sounds)
-	// exec(command, (err, stdout, stderr) => {
-	//   if (err) {
-	//     console.log('err', err);
-	//     return;
-	//   }
-	//   // the *entire* stdout and stderr (buffered)
-	//   console.log(`stdout: ${stdout}`);
-	//   console.log(`stderr: ${stderr}`);
-	// });
 }
 
 module.exports = {
