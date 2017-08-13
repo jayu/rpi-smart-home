@@ -141,7 +141,10 @@ module.exports = () => {
     });
     api.get('/musicPlayer/test2', function (req, res) {
         music_player._readMusicInfo()
-        .then((info) => {console.log(info)})
+        .then((info) => {
+		console.log(info)
+		res.json(info)
+	})
     });
     api.ws('/', function(ws, req) {
         console.log('new ws connections');
