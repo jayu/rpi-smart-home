@@ -137,7 +137,7 @@ module.exports = () => {
         })
     });
     api.get('/musicPlayer/test', function (req, res) {
-        music_player._getFileInfo('YI - mowilas.mp3');
+        music_player._getFileInfo('trap/YI - mowilas.mp3');
     });
     api.ws('/', function(ws, req) {
         console.log('new ws connections');

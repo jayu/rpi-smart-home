@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path')
-const {spawn, exec} = require('path')
+const {spawn, exec} = require('child_process')
 const {SoundPlayer} = require('./sound_player.js')
 
 
@@ -23,8 +23,11 @@ class MusicPlayer {
 		this.repeat = false;
 	}
 	_getFileInfo(name) {
-		const soxi = exec(`soxi ${path.join(this.sourceDir, name)}`)
-		soxi.on('data', (data) => {
+		const filePath = `soxi '${path.join(this.sourceDir, name)}'`
+		console.log(filePath)
+		const soxi = exec(filePath)
+		soxi.stdout.pipe(process.stdout)
+		soxi.stdout.on('data', (data) => {
 			console.log('soxi data : ', data);
 		})
 
