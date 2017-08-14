@@ -35,36 +35,51 @@ class SoundPlayer {
 			
 			currentProcess.stdout.pipe(process.stdout);
 			currentProcess.stderr.pipe(process.stderr);
-
-			const endPromise = new Promise();
-
-			currentProcess.on('exit', (code, code2) => {
-				console.log('exit code', code, code2);
-				endPromise.resolve(code, code2);
-				this.currentPlaying = false;
-				self._playNext()
-			})
-
-			resolve({
-				kill : () => {
-					currentProcess.kill()
-				},
-				replace : (newSound) => {
-					currentProcess.kill(); 
-					return self._insertOnStart(newSound)
-				},
-				endPromise
-			})
-			
+			let resolveEnd = null;
+			const endPromise = new Promise((resolve, reject )=> {
+				resolveEnd = resolve
+			});
+				currentProcess.on('exit', (code, code2) => {
+                                	console.log('exit code', code, code2);
+                                	this.currentPlaying = false;
+                                	self._playNext()
+					resolveEnd(code, code2);
+                        	})
+                        	currentProcess.on('close', (code, code2) => {
+                                	console.log("close code", code, code2)
+                       		})
+                        	console.log('resolving process creation');
+				console.log(this);
+				try {
+                        		console.log(endPromise, this, this== endPromise)
+				}	
+				catch(e) {
+					console.log(e);
+				}
+				resolve({
+                                	kill : () => {
+                                        	currentProcess.kill()
+                                	},
+                                	replace : (newSound) => {
+                                        	currentProcess.kill();
+                                        	return self._insertOnStart(newSound)
+                                	},
+                                	endPromise,
+                        	})
+				
+			//});			
+		}
+		else {
+			console.log('playing nex: empty queue')
 		}
 
 	}
 	_joinSounds(soundArr) {
 		let command = '';
 		for (let i = 0; i < soundArr.length-1; i++) {
-			command += `play ${soundArr[i]} && `;
+			command += `play '${soundArr[i]}' && `;
 		}
-		command += `play ${soundArr[soundArr.length-1]}`
+		command += `play '${soundArr[soundArr.length-1]}'`
 		
 		return command;
 	}
@@ -75,7 +90,7 @@ class SoundPlayer {
 			command = this. _joinSounds(sound)
 		}
 		else {
-			command = `play ${sound}`
+			command = `play '${sound}'`
 		}
 		return command;
 	}

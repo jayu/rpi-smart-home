@@ -30,8 +30,8 @@ class MusicPlayer {
 	_parseTimeInfo(time) {
 		time = time.split(":");
 		time = (time.slice(0,2).concat(time[2].split(".")))
-		console.log(time);
-		console.log(time.map(parseInt));
+		//console.log(time);
+		//console.log(time.map(parseInt));
 		//time = time.map(parseInt)
 		return time[0] * 1000 * 60 * 60 + time[1] * 1000 * 60 + time[2] * 1000 + time[3]
 	}
@@ -93,13 +93,15 @@ class MusicPlayer {
 		SoundPlayer.play(this.queue[this.currentQueueIndex])
 		.then((currentSound) => {
 			self.currentSound = currentSound;
+			console.log('currentSound', currentSound)
 			return currentSound.endPromise
 		})
 		.then((code, code2) => {
-			if (shuffle) { //repeat inculuded
+			console.log('song play end', code, code2)
+			if (self.shuffle) { //repeat inculuded
 				self.currentQueueIndex = ~~(self.queue.length * Math.random())
 			}
-			else if (repeat && self.currentQueueIndex == self.queue.length - 1) {
+			else if (self.repeat && self.currentQueueIndex == self.queue.length - 1) {
 				self.currentQueueIndex = 0;
 			}
 			else {
@@ -118,7 +120,7 @@ class MusicPlayer {
 		// 	songLike : '', // string 
 		// }
 		console.log(args);
-		console.log(this.musicInfo)
+		//console.log(this.musicInfo)
 		if (args.playlist) { // one song per one SoundPlayer.play - allow other sounds ex. system info be played between songs
 			//once the song finished, promise is resolved and next song is playing
 			// here just create playQueue of songs and fire _playQueue
