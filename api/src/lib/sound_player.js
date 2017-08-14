@@ -13,46 +13,57 @@ class SoundPlayer {
 		this.queue = []; // {command, resolve}
 		this.currentPlaying = false;
 	}
-	_addToQueue(command) { 
+	_addToQueue(songs) { 
 		return new Promise((resolve, reject) => {
-			this.queue.push({command, resolve});
+			this.queue.push({songs, resolve});
 			this._playNext();
 		})
 	}
-	_insertOnStart(command) {
+	_insertOnStart(songs) {
 		return new Promise((resolve, reject) => {
-			//this.queue.push({command, resolve}); insert on start
+			this.queue.unshift({songs, resolve}); //insert on start
+			console.log(this.queue)
 			this._playNext();
 		})
 	}
 	_playNext() {
 		if (!this.currentPlaying && this.queue.length > 0) {
 			this.currentPlaying = true;
-
+			let killed = false;
 			const self = this;
-			const {command, resolve} = this.queue.shift();
-			const currentProcess = exec(command);
-			
-			currentProcess.stdout.pipe(process.stdout);
-			currentProcess.stderr.pipe(process.stderr);
+			const {songs, resolve} = this.queue.shift();
+			//const currentProcess = execFile(command);
+			const currentProcess = execFile('play', songs)
+			//currentProcess.stdout.pipe(process.stdout);
+			//currentProcess.stderr.pipe(process.stderr);
 			let resolveEnd = null;
 			const endPromise = new Promise((resolve, reject )=> {
 				resolveEnd = resolve
 			});
+			let logs = '';
+			currentProcess.on('data', (data) => {
+				logs += data.toString()
+				console.log(logs)
+			})
 			currentProcess.on('exit', (code, code2) => {
-      	console.log('exit code', code, code2);
+	 
+      	console.log('out', logs)
+	console.log('exit code', code, code2);
       	this.currentPlaying = false;
       	self._playNext()
-				resolveEnd(code != null ? 'end' : 'killed');
+				resolveEnd(!killed ? 'end' : 'killed');
     	})
 
 			resolve({
       	kill : () => {
+	  console.log('killing current process', currentProcess)
+	  killed = true;
           currentProcess.kill()
       	},
       	replace : (newSound) => {
+		killed = true
         	currentProcess.kill();
-        	return self._insertOnStart(newSound)
+        	return self._insertOnStart(newSound.constructor == Array ? newSound : [newSound])
       	},
       	endPromise,
     	})		
@@ -83,7 +94,7 @@ class SoundPlayer {
 		return command;
 	}
 	play(sound) {
-		return this._addToQueue(this._soundToCommand(sound))
+		return this._addToQueue(sound.constructor == Array ? sound : [sound])
 	}
 
 }

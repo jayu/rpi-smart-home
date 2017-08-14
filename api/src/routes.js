@@ -152,12 +152,15 @@ module.exports = () => {
             songLike : req.body.songLike,
             song : req.body.song
         })
+	res.send('done')
     })
     api.post('/musicPlayer/stop', function (req, res) {
         music_player.stop()
+	res.send('done')
     })
     api.post('/musicPlayer/next', function (req, res) {
         music_player.next()
+	res.send('done')
     })
     api.ws('/', function(ws, req) {
         console.log('new ws connections');

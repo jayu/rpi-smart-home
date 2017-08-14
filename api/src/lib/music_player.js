@@ -21,7 +21,7 @@ class MusicPlayer {
 		this.currentSound = {};
 		this.currnetSong = {};
 		this.shuffle = false;
-		this.repeat = false;
+		this.repeat = true//false;
 		this._readMusicInfo()
 		.then((musicInfo) => {
 			this.musicInfo = musicInfo
@@ -105,8 +105,8 @@ class MusicPlayer {
 		}
 	}
 	_playbackEnd(code) {
+		console.log('playback end', code)
 		if (code == 'end') {
-				console.log('song play end', code, code2)
 			this._setNextSongIndex()
 			if (this.currentQueueIndex >=0 && this.currentQueueIndex < this.queue.length) {
 				this._playQueue()	
@@ -140,6 +140,7 @@ class MusicPlayer {
 
 	}
 	stop() { //kill current song
+		console.log('killing current song', this.currentSound)
 		this.currentSound.kill();
 	}
 	next() {
