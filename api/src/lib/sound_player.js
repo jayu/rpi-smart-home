@@ -39,38 +39,26 @@ class SoundPlayer {
 			const endPromise = new Promise((resolve, reject )=> {
 				resolveEnd = resolve
 			});
-				currentProcess.on('exit', (code, code2) => {
-                                	console.log('exit code', code, code2);
-                                	this.currentPlaying = false;
-                                	self._playNext()
-					resolveEnd(code, code2);
-                        	})
-                        	currentProcess.on('close', (code, code2) => {
-                                	console.log("close code", code, code2)
-                       		})
-                        	console.log('resolving process creation');
-				console.log(this);
-				try {
-                        		console.log(endPromise, this, this== endPromise)
-				}	
-				catch(e) {
-					console.log(e);
-				}
-				resolve({
-                                	kill : () => {
-                                        	currentProcess.kill()
-                                	},
-                                	replace : (newSound) => {
-                                        	currentProcess.kill();
-                                        	return self._insertOnStart(newSound)
-                                	},
-                                	endPromise,
-                        	})
-				
-			//});			
+			currentProcess.on('exit', (code, code2) => {
+      	console.log('exit code', code, code2);
+      	this.currentPlaying = false;
+      	self._playNext()
+				resolveEnd(code != null ? 'end' : 'killed');
+    	})
+
+			resolve({
+      	kill : () => {
+          currentProcess.kill()
+      	},
+      	replace : (newSound) => {
+        	currentProcess.kill();
+        	return self._insertOnStart(newSound)
+      	},
+      	endPromise,
+    	})		
 		}
 		else {
-			console.log('playing nex: empty queue')
+			console.log('playing next: empty queue or player in use')
 		}
 
 	}

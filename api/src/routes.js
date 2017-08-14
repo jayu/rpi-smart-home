@@ -153,6 +153,12 @@ module.exports = () => {
             song : req.body.song
         })
     })
+    api.post('/musicPlayer/stop', function (req, res) {
+        music_player.stop()
+    })
+    api.post('/musicPlayer/next', function (req, res) {
+        music_player.next()
+    })
     api.ws('/', function(ws, req) {
         console.log('new ws connections');
         const socket = new WS(ws);

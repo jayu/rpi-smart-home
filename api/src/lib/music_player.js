@@ -88,30 +88,35 @@ class MusicPlayer {
 		this.currentQueueIndex = 0;
 		this.queue = songs;
 	}
+	_setCurrentSound(currentSound) {
+		this.currentSound = currentSound;
+		console.log('currentSound', currentSound)
+		return currentSound.endPromise
+	}
+	_setNextSongIndex() {
+		if (this.shuffle) { //repeat inculuded
+				this.currentQueueIndex = ~~(this.queue.length * Math.random())
+		}
+		else if (this.repeat && this.currentQueueIndex == this.queue.length - 1) {
+			this.currentQueueIndex = 0;
+		}
+		else {
+			this.currentQueueIndex++;	
+		}
+	}
+	_playbackEnd(code) {
+		if (code == 'end') {
+				console.log('song play end', code, code2)
+			this._setNextSongIndex()
+			if (this.currentQueueIndex >=0 && this.currentQueueIndex < this.queue.length) {
+				this._playQueue()	
+			}
+		}
+	}
 	_playQueue() { // recursive playing songs from playQueue
-		const self = this;
 		SoundPlayer.play(this.queue[this.currentQueueIndex])
-		.then((currentSound) => {
-			self.currentSound = currentSound;
-			console.log('currentSound', currentSound)
-			return currentSound.endPromise
-		})
-		.then((code, code2) => {
-			console.log('song play end', code, code2)
-			if (self.shuffle) { //repeat inculuded
-				self.currentQueueIndex = ~~(self.queue.length * Math.random())
-			}
-			else if (self.repeat && self.currentQueueIndex == self.queue.length - 1) {
-				self.currentQueueIndex = 0;
-			}
-			else {
-				self.currentQueueIndex++;	
-			}
-
-			if (self.currentQueueIndex >=0 && self.currentQueueIndex < self.queue.length) {
-				self._playQueue()	
-			}
-		})
+		.then(this._setCurrentSound.bind(this))
+		.then(this._playbackEnd.bind(this))
 	}
 	play(args) {
 		// args = {
@@ -135,10 +140,13 @@ class MusicPlayer {
 
 	}
 	stop() { //kill current song
-
+		this.currentSound.kill();
 	}
 	next() {
-
+		this._setNextSongIndex()
+		this.currentSound.replace(this.queue[this.currentQueueIndex])
+		.then(this._setCurrentSound.bind(this))
+		.then(this._playbackEnd.bind(this))
 	}
 	prev() {
 
