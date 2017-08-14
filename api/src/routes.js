@@ -142,10 +142,17 @@ module.exports = () => {
     api.get('/musicPlayer/test2', function (req, res) {
         music_player._readMusicInfo()
         .then((info) => {
-		console.log(info)
-		res.json(info)
-	})
+    		console.log(info)
+    		res.json(info)
+        })
     });
+    api.post('/musicPlayer/play', function (req, res) {
+        music_player.play({
+            playlist : req.body.playlist,
+            songLike : req.body.songLike,
+            song : req.body.song
+        })
+    })
     api.ws('/', function(ws, req) {
         console.log('new ws connections');
         const socket = new WS(ws);

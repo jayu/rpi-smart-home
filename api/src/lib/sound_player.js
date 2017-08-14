@@ -35,8 +35,12 @@ class SoundPlayer {
 			
 			currentProcess.stdout.pipe(process.stdout);
 			currentProcess.stderr.pipe(process.stderr);
+
+			const endPromise = new Promise();
+
 			currentProcess.on('exit', (code, code2) => {
 				console.log('exit code', code, code2);
+				endPromise.resolve(code, code2);
 				this.currentPlaying = false;
 				self._playNext()
 			})
@@ -48,7 +52,8 @@ class SoundPlayer {
 				replace : (newSound) => {
 					currentProcess.kill(); 
 					return self._insertOnStart(newSound)
-				}
+				},
+				endPromise
 			})
 			
 		}

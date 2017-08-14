@@ -16,11 +16,16 @@ class MusicPlayer {
 		//this.soundPlayer = soundPlayer;
 		this.sourceDir = sourceDir;
 		this.musicInfo = {};
-		this.playQueue = [];
-		this.currentPlayingSound = {};
-		this.currnetPlayingSong = {};
+		this.queue = [];
+		this.currentQueueIndex = 0;
+		this.currentSound = {};
+		this.currnetSong = {};
 		this.shuffle = false;
 		this.repeat = false;
+		this._readMusicInfo()
+		.then((musicInfo) => {
+			this.musicInfo = musicInfo
+		})
 	}
 	_parseTimeInfo(time) {
 		time = time.split(":");
@@ -33,9 +38,10 @@ class MusicPlayer {
 	_getFileInfo(playlist, name) {
 		const self = this;
 		return new Promise((resolve, reject) => {
-			const filePath = `soxi '${path.join(this.sourceDir, playlist, name)}'`
+			const filePath = path.join(this.sourceDir, playlist, name)
+			const command = `soxi '${filePath}'`
 			let fileData = ''
-			const soxi = exec(filePath)
+			const soxi = exec(command)
 			soxi.stdout.pipe(process.stdout)
 			soxi.stdout.on('data', (data) => {
 				fileData += data.toString();
@@ -44,7 +50,8 @@ class MusicPlayer {
 				const duration = self._parseTimeInfo(fileData.match(/\d\d:\d\d:\d\d.\d\d/)[0]);
 				resolve({
 					name,
-					duration
+					duration,
+					path : filePath
 				})
 			})
 		}) 
@@ -52,6 +59,7 @@ class MusicPlayer {
 	_readMusicInfo() {
 		const self = this
 		const playlists = fs.readdirSync(this.sourceDir);
+		console.log('readdirSync', playlists)
 		return Promise.all(
 			playlists.map((playlist) => {
 				const songs = fs.readdirSync(path.join(self.sourceDir, playlist))
@@ -63,6 +71,7 @@ class MusicPlayer {
 				})
 			})) 
 			.then((music) => {
+				console.log('hasMusicInfo')
 				const musicInfo = {
 					playlists : {}
 				}
@@ -73,14 +82,58 @@ class MusicPlayer {
 			})
 	}
 	getMusicInfo() {
+		return this.musicInfo;
+	}
+	_setQueue(songs) {
+		this.currentQueueIndex = 0;
+		this.queue = songs;
+	}
+	_playQueue() { // recursive playing songs from playQueue
+		const self = this;
+		SoundPlayer.play(this.queue[this.currentQueueIndex])
+		.then((currentSound) => {
+			self.currentSound = currentSound;
+			return currentSound.endPromise
+		})
+		.then((code, code2) => {
+			if (shuffle) { //repeat inculuded
+				self.currentQueueIndex = ~~(self.queue.length * Math.random())
+			}
+			else if (repeat && self.currentQueueIndex == self.queue.length - 1) {
+				self.currentQueueIndex = 0;
+			}
+			else {
+				self.currentQueueIndex++;	
+			}
 
+			if (self.currentQueueIndex >=0 && self.currentQueueIndex < self.queue.length) {
+				self._playQueue()	
+			}
+		})
 	}
 	play(args) {
-		args = {
-			playlist : '', // playlist id
-			song : '', // song id
-			songLike : '', // string 
+		// args = {
+		// 	playlist : '', // playlist id
+		// 	song : '', // song id
+		// 	songLike : '', // string 
+		// }
+		console.log(args);
+		console.log(this.musicInfo)
+		if (args.playlist) { // one song per one SoundPlayer.play - allow other sounds ex. system info be played between songs
+			//once the song finished, promise is resolved and next song is playing
+			// here just create playQueue of songs and fire _playQueue
+			this._setQueue(this.musicInfo.playlists[args.playlist].map((song) => (song.path)))
+			if (this.queue.length > 0) {
+				this._playQueue();
+			}
+
 		}
+	}
+	pasue() { //later need to play trimmed sound
+
+	}
+	stop() { //kill current song
+
 	}
 	next() {
 
