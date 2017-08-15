@@ -2,7 +2,7 @@ const fs = require('fs');
 const ytdl = require('ytdl-core');
 const SpotifyWebApi = require('spotify-web-api-node');
 const { spotify, yt } = require('./credentials.js');
-const { spawn } = require('child_process')
+const { spawn, execFile } = require('child_process')
 const YouTube = require('youtube-node');
 const youTube = new YouTube();
 youTube.setKey(yt);
@@ -115,9 +115,11 @@ const downloadFromYoutube = (videoId, fileName) => {
 	    })
 	  downloadStream.pipe(fs.createWriteStream(outPath));
 	  downloadStream.on('end', () => {
-	  	resolve(null, outPath)
+		console.log('download stream end', outPath);
+	  	resolve(outPath)
 	  })
 	  downloadStream.on('error', (err) => {
+		console.log('download stream error')
 	  	resolve(err)
 	  })
 	})
@@ -126,9 +128,19 @@ const downloadFromYoutube = (videoId, fileName) => {
 
 const convertMp4toMp3 = (inFilePath, outFilePath) => {
 	return new Promise((resolve, reject) => {
-		const converter = spawn('avconv', [-'i', inFilePath, '-vn', '-ab', '320k', outFilePath])
+		const args = ['-i', inFilePath, '-vn', '-ab', '320k', '-y', outFilePath];
+		console.log(args)
+		const converter = spawn('avconv', args)
+		console.log('conversion start');
+		converter.stdout.pipe(process.stdout)
+		converter.stdout.on('data', function(data) {
+		    console.log("converter : ", data.toString()); 
+		});
 		converter.on('exit', () => {
 			resolve(outFilePath)
+		})
+		converter.on('error', (err) => {
+			console.log('converter error')
 		})
 	})
 }
@@ -215,11 +227,18 @@ authenticateSpotify()
 		.then((youTubeIds) => {
 			console.log(youTubeIds.map((song) => (song.id)))
 			console.log('downloading');
-			return downloadFromYoutube(youTubeIds[0].id, youTubeIds[0].title)
+			return downloadFromYoutube(youTubeIds[4].id, youTubeIds[4].title)
 		})
 		.then((outputFile) => {
 			console.log('file downloaded!', outputFile) 
 			return convertMp4toMp3(outputFile, outputFile.substr(0, outputFile.length-1) + '3')
+		})
+		.then((some) => {
+			console.log('convertEnd')
+			console.log(some);
+		})
+		.catch((err) => {
+			console.log(err)
 		})
 })
 
