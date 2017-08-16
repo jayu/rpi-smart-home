@@ -10,7 +10,9 @@ const {parseBoolean} = require('./utils')
 const {play, getTemp, monitorTemp} = require('./play_temperature')
 const MusicPlayer = require('./lib/music_player.js')
 
-const music_player = new MusicPlayer(path.join(__dirname, "res/music"));
+const { downloadFromYoutube, updateSpotifySongs } = require('./lib/youtubify.js')
+
+//const music_player = new MusicPlayer(path.join(__dirname, "res/music"));
 
 monitorTemp()
 setInterval(monitorTemp, 29*60*1000)
@@ -161,6 +163,63 @@ module.exports = () => {
     api.post('/musicPlayer/next', function (req, res) {
         music_player.next()
 	res.send('done')
+    })
+
+    api.get('/videoTest', function (req, res) {
+        res.writeHead(200, { "Content-Type": "text/html" });
+        res.end('<video src="http://192.168.8.100:3000/api/piki.mp4" controls></video>');
+    })
+    api.get('/piki.mp4', function(req,res) {
+        //res.writeHead(200, {'Content-type' : 'video/mp4'})
+        const filepath = path.join(__dirname, 'res/piki.mp4');
+        const stat = fs.statSync(filepath)
+        const fileSize = stat.size
+        const range = req.headers.range
+        if (range) {
+            console.log('range')
+            const parts = range.replace(/bytes=/, "").split("-")
+            const start = parseInt(parts[0], 10)
+            const end = parts[1] 
+              ? parseInt(parts[1], 10)
+              : fileSize-1
+            const chunksize = (end-start)+1
+            const file = fs.createReadStream(filepath, {start, end})
+            const head = {
+              'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+              'Accept-Ranges': 'bytes',
+              'Content-Length': chunksize,
+              'Content-Type': 'video/mp4',
+            }
+            res.writeHead(206, head);
+            file.pipe(res);
+        } else {
+            console.log('no range')
+            const head = {
+              'Content-Length': fileSize,
+              'Content-Type': 'video/mp4',
+            }
+            res.writeHead(200, head)
+            fs.createReadStream(filepath).pipe(res)
+        }
+    })
+    api.get('/youtube/:id', function (req,res) {
+        downloadFromYoutube(req.params.id, 'tewt', res)
+    })
+    api.get('/updateSpotify', function (req, res) {
+        const toOmmit = [ 'Uro Martynki',
+          'Afternoon Train Ride',
+          'Emotron',
+          'deep Chill',
+          'kartka',
+          'Reading Soundtrack',
+          'car rollin',
+          'russ Hip-Hop',
+          'Holidays',
+          'Hip-Hop & R&B',
+          'Bedoes' 
+        ]
+        updateSpotifySongs('11156868367', toOmmit, path.join(__dirname, 'res/music'))
+        res.send('done');
     })
     api.ws('/', function(ws, req) {
         console.log('new ws connections');
