@@ -1,3 +1,5 @@
 */node_modules/
 api/src/res
 credentials.js
+*.mp3
+*.mp4

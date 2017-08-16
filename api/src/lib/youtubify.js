@@ -128,7 +128,7 @@ const downloadFromYoutube = (videoId, fileName) => {
 
 const convertMp4toMp3 = (inFilePath, outFilePath) => {
 	return new Promise((resolve, reject) => {
-		const args = ['-i', inFilePath, '-vn', '-ab', '320k', outFilePath];
+		const args = ['-i', inFilePath, '-vn', '-ab', '320k', '-y', outFilePath];
 		console.log(args)
 		const converter = spawn('avconv', args)
 		console.log('conversion start');
@@ -227,7 +227,7 @@ authenticateSpotify()
 		.then((youTubeIds) => {
 			console.log(youTubeIds.map((song) => (song.id)))
 			console.log('downloading');
-			return downloadFromYoutube(youTubeIds[0].id, youTubeIds[0].title)
+			return downloadFromYoutube(youTubeIds[4].id, youTubeIds[4].title)
 		})
 		.then((outputFile) => {
 			console.log('file downloaded!', outputFile) 
