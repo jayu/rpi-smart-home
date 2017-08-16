@@ -1,4 +1,11 @@
+// check convertion on device
+// delete temp dirs
+// file compare
+// authenticate spotify to get private
+
+
 const fs = require('fs');
+const path = require('path')
 const ytdl = require('ytdl-core');
 const SpotifyWebApi = require('spotify-web-api-node');
 const { spotify, yt } = require('./credentials.js');
@@ -77,7 +84,8 @@ const findOnYoutube = (title) => {
 			    .map((item) => ({
 			    	id : item.id.videoId, 
 			    	title : item.snippet.title, 
-			    	description : item.snippet.description
+			    	description : item.snippet.description,
+			    	desiredTitle : title
 			    }))
 			    .map((song, index) => {
 			    	//console.log('########################################################################################')
@@ -104,31 +112,51 @@ const findOnYoutube = (title) => {
 	})
 }
 
-const downloadFromYoutube = (videoId, fileName) => {
-	return new Promise((resolve, reject) => {
-		const outPath = `${fileName}.mp4`
-	  const downloadStream = ytdl(`https://www.youtube.com/watch?v=${videoId}`, {
-	      filter: (arg) => {
-	        console.log(arg)
-	        return arg.container == 'mp4'
-	      }
-	    })
-	  downloadStream.pipe(fs.createWriteStream(outPath));
-	  downloadStream.on('end', () => {
-		console.log('download stream end', outPath);
-	  	resolve(outPath)
-	  })
-	  downloadStream.on('error', (err) => {
-		console.log('download stream error')
-	  	resolve(err)
-	  })
+const getBestYTFormat = (videoId) => {
+	return ytdl.getInfo(`https://www.youtube.com/watch?v=${videoId}`)
+	.then((info) => {
+		info.formats.sort((format1, format2) => {
+			if (format1.audioBitrate > format2.audioBitrate) {
+				return -1
+			}
+			if (format1.audioBitrate < format2.audioBitrate) {
+				return 1
+			}
+			if (format1.audioBitrate == format2.audioBitrate) {
+				return 0
+			}
+		})
+		return info.formats[0]
 	})
-   // resolve promise when ended
 }
 
-const convertMp4toMp3 = (inFilePath, outFilePath) => {
+const _downloadFromYoutube = (videoId, fileName, writable) => {
 	return new Promise((resolve, reject) => {
-		const args = ['-i', inFilePath, '-vn', '-ab', '320k', '-y', outFilePath];
+		getBestYTFormat(videoId)
+		.then((format) => {
+			const outputPath = `${fileName}.${format.container}`
+			console.log('downloading file', outputPath, " with bitrate ", format.audioBitrate)
+		  const downloadStream = ytdl(`https://www.youtube.com/watch?v=${videoId}`, {format})
+		  if (writable) {
+		  	downloadStream.pipe(writable);
+		  }
+		  else {
+		  	downloadStream.pipe(fs.createWriteStream(outputPath));
+		  }
+		  downloadStream.on('end', () => {
+			console.log('download stream end', outputPath);
+		  	resolve({outputPath, bitrate : format.audioBitrate})
+		  })
+		  downloadStream.on('error', (err) => {
+			console.log('download stream error')
+		  	resolve(err)
+		  })
+		})
+	})
+}
+const _convertMp4toMp3 = (inFilePath, outFilePath, bitrate) => {
+	return new Promise((resolve, reject) => {
+		const args = ['-i', inFilePath, '-vn', '-ab', bitrate ? `${bitrate}k` : '320k', '-y', outFilePath];
 		console.log(args)
 		const converter = spawn('avconv', args)
 		console.log('conversion start');
@@ -144,7 +172,69 @@ const convertMp4toMp3 = (inFilePath, outFilePath) => {
 		})
 	})
 }
+class DownloadQueue {
+	constructor() {
+		this.queue = [];
+		this.currentDownload = null;
+	}
+	add(trackInfo, resolve) {
+		this.queue.push({trackInfo, resolve})
+		console.log("###### Download Queue length", this.queue.length)
+		this._download()
+	}
+	_download() {
+		if (!this.currentDownload && this.queue.length > 0) {
+			const self = this;
+			const {trackInfo, resolve} = this.queue.shift()
+			const {videoId, fileName, writable} = trackInfo;
+			this.currentDownload = _downloadFromYoutube(videoId, fileName, writable);
+			this.currentDownload.then((info) => {
+				resolve(info)
+				this.currentDownload = null;
+				this._download()
+			})
+		}
+	}
+}
+class ConvertQueue {
+	constructor() {
+		this.queue = [];
+		this.currentConvert = null;
+	}
+	add(trackInfo, resolve) {
+		this.queue.push({trackInfo, resolve})
+		console.log("###### Convert Queue length", this.queue.length)
+		this._convert()
+	}
+	_convert() {
+		if (!this.currentConvert && this.queue.length > 0) {
+			const self = this;
+			const {trackInfo, resolve} = this.queue.shift()
+			const {inFilePath, outFilePath, bitrate} = trackInfo;
+			this.currentConvert = _convertMp4toMp3(inFilePath, outFilePath, bitrate);
+			this.currentConvert.then((info) => {
+				resolve(info)
+				this.currentConvert = null;
+				this._convert()
+			})
+		}
+	}
+}
+const downloadQueue = new DownloadQueue();
 
+const convertQueue = new ConvertQueue();
+
+const downloadFromYoutube = (videoId, fileName, writable) => {
+	return new Promise((resolve, reject) => {
+		downloadQueue.add({videoId, fileName, writable}, resolve);
+	})
+}
+
+const convertMp4toMp3 = (inFilePath, outFilePath, bitrate) => {
+	return new Promise((resolve, reject) => {
+		convertQueue.add({inFilePath, outFilePath, bitrate}, resolve);
+	})
+}
 
 const authenticateSpotify = () => {
   const spotifyApi = new SpotifyWebApi({
@@ -186,6 +276,19 @@ const authenticateSpotify = () => {
         console.log('Something went wrong!', err);
       });
   }
+  const deleteFolderRecursive = function(_path) {
+	  if( fs.existsSync(_path) ) {
+	    fs.readdirSync(_path).forEach(function(file,index){
+	      var curPath = _path + "/" + file;
+	      if(fs.lstatSync(curPath).isDirectory()) { // recurse
+	        deleteFolderRecursive(curPath);
+	      } else { // delete file
+	        fs.unlinkSync(curPath);
+	      }
+	    });
+	    fs.rmdirSync(_path);
+	  }
+	};
   //  #1
 
     // spotifyApi.getMySavedTracks({ // requires authentication scope : user-library-read
@@ -202,46 +305,108 @@ const authenticateSpotify = () => {
 // getYoutubeId('21 savage savage mode').then((id) => {
 // 	console.log(id);
 // })
-const userId = '11156868367'
-authenticateSpotify()
-.then((spotifyApi) => {
-	return getUserPlaylists(spotifyApi)(userId)
-		.then((playlists) => {
-			return playlists.filter((playlist) => {
-				return playlist.name == "deep Chill"
+const updateSpotifySongs = (userId, ommitPlaylists, outDir) => {
+	authenticateSpotify()
+	.then((spotifyApi) => {
+		return getUserPlaylists(spotifyApi)(userId)
+			.then((playlists) => {
+				return playlists.filter((playlist) => {
+					return !ommitPlaylists.includes(playlist.name)
+				})
 			})
-		})
-		.then((desiredPlaylist) => {
-			//console.log(desiredPlaylist)
-			return desiredPlaylist[0].id
-		})
-		.then((playlistId) => {
-			//console.log(playlistId)
-			return getPlaylistTracks(spotifyApi)(userId, playlistId)
-		})
-		.then((tracks) => {
-			//tracks = tracks.slice(0,3);
-			console.log(tracks)
-			return Promise.all(tracks.map(findOnYoutube))
-		})
-		.then((youTubeIds) => {
-			console.log(youTubeIds.map((song) => (song.id)))
-			console.log('downloading');
-			return downloadFromYoutube(youTubeIds[4].id, youTubeIds[4].title)
-		})
-		.then((outputFile) => {
-			console.log('file downloaded!', outputFile) 
-			return convertMp4toMp3(outputFile, outputFile.substr(0, outputFile.length-1) + '3')
-		})
-		.then((some) => {
-			console.log('convertEnd')
-			console.log(some);
-		})
-		.catch((err) => {
-			console.log(err)
-		})
-})
+			.then((desiredPlaylist) => {
+				console.log(desiredPlaylist.map((p) => (p.name)))
+				return desiredPlaylist.map((p) => ({id : p.id, name : p.name}))
+			})
+			.then((playlists) => {
+				console.log(playlists)
+				return Promise.all(playlists.map(({id}) => (getPlaylistTracks(spotifyApi)(userId, id) )))
+					.then(playlistsTracks => {
+						console.log(playlistsTracks)
+						playlistsList = {};
 
+						playlistsTracks.map((playlistTracks, i) => {
+							playlistsList[playlists[i].name] = playlistTracks
+						})
+
+						return playlistsList
+					})
+			})
+			.then((playlistsList) => {
+				//tracks = tracks.slice(0,3);
+				console.log(playlistsList)
+				const tracksSearchings = [];
+				Object.keys(playlistsList).forEach((playlistName) => {
+					tracksSearchings.push(Promise.all(playlistsList[playlistName].map(findOnYoutube)))
+				})
+				return Promise.all(tracksSearchings)
+					.then((playlistsYoutubeTracks) => {
+						const playlistsTracksToDownload = {}
+						Object.keys(playlistsList).forEach((playlistName, i) => {
+							playlistsTracksToDownload[playlistName] = playlistsYoutubeTracks[i]
+						})
+						return playlistsTracksToDownload
+					})
+			})
+			.then((playlistsTracksToDownload) => {
+				console.log(playlistsTracksToDownload);
+				const allDownloads = []
+				Object.keys(playlistsTracksToDownload).forEach((playlistName) => {
+					console.log(playlistName)
+					console.log(playlistsTracksToDownload[playlistName].map(({desiredTitle, id}) => ({desiredTitle,id})))
+					playlistsTracksToDownload[playlistName].forEach(({desiredTitle, id}) => {
+						const tempDirectory = path.join(outDir, `temp_${playlistName}`)
+						const tempFilePath = path.join(tempDirectory, desiredTitle)
+						if (!fs.existsSync(tempDirectory)) {
+							fs.mkdirSync(tempDirectory);
+						}
+						console.log(tempDirectory, tempFilePath)
+						allDownloads.push(
+								downloadFromYoutube(id, tempFilePath) // make it queueuueeuueeueueueueuuue
+								.then(({ outputPath, bitrate }) => {
+									console.log('file downloaded!', outputPath)
+									const targetDirectory = path.join(outDir, playlistName)
+									const targetFilePath =  path.join(targetDirectory, desiredTitle) + ".mp3"
+									if (!fs.existsSync(targetDirectory)) {
+    								fs.mkdirSync(targetDirectory);
+									}
+									console.log(targetDirectory, targetFilePath);
+									return convertMp4toMp3(outputPath, targetFilePath, bitrate) // make it queueueueueueu
+								})
+								.then((convertedFile) => {
+									//TODO  delete mp4 file here
+									console.log("File", convertedFile, "downloaded and converted");
+									return convertedFile
+								})
+							)
+					})
+				})
+				//console.log(youTubeIds.map((song) => (song.id)))
+				//console.log('downloading');
+				//return downloadFromYoutube(youTubeIds[4].id, youTubeIds[4].title)
+				return Promise.all(allDownloads)
+					.then((allDownloads) => {
+						Object.keys(playlistsTracksToDownload).forEach((playlistName) => {
+							const tempDirectory = path.join(outDir, `temp_${playlistName}`)
+							deleteFolderRecursive(tempDirectory)
+						})
+						return allDownloads
+					})
+			})
+			.then((allDownloads) => {
+				console.log('whole task finnished', allDownloads);
+
+			})
+			.catch((err) => {
+				console.log(err)
+			})
+	})
+}
+
+// downloadFromYoutube('bOzqpj3O3OY', 'piki')
+// .then((outputPath) => {
+// 	console.log(outputPath)
+// })
 
 // get spotify playlists
 // compare to downloaded one
@@ -250,3 +415,7 @@ authenticateSpotify()
 // get info from tracks to download
 // select format mp3 if avaliable or mp4 and conver later // avconv  -i fileIN -vn -ab 320k fileOUT
 
+module.exports = {
+	downloadFromYoutube,
+	updateSpotifySongs
+}
