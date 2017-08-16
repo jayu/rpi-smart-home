@@ -30,25 +30,20 @@ class SoundPlayer {
     if (!this.currentPlaying && this.queue.length > 0) {
       this.currentPlaying = true;
       let killed = false;
+      let resolveEnd = null;
       const self = this;
       const { songs, resolve } = this.queue.shift();
-      //const currentProcess = execFile(command);
+      
       const currentProcess = execFile('play', songs)
+
       currentProcess.stdout.pipe(process.stdout);
       currentProcess.stderr.pipe(process.stderr);
-      let resolveEnd = null;
+
       const endPromise = new Promise((resolve, reject) => {
         resolveEnd = resolve
       });
-      let logs = '';
-      currentProcess.on('data', (data) => {
-        logs += data.toString()
-        console.log(logs)
-      })
-      currentProcess.on('exit', (code, code2) => {
 
-        console.log('out', logs)
-        console.log('exit code', code, code2);
+      currentProcess.on('exit', (code, code2) => {
         this.currentPlaying = false;
         self._playNext()
         resolveEnd(!killed ? 'end' : 'killed');
@@ -99,3 +94,5 @@ class SoundPlayer {
 module.exports = {
   SoundPlayer: new SoundPlayer()
 }
+
+
