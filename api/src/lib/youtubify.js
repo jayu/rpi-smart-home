@@ -372,6 +372,7 @@ const updateSpotifySongs = (userId, ommitPlaylists, outDir) => {
 									}
 									console.log(targetDirectory, targetFilePath);
 									return convertMp4toMp3(outputPath, targetFilePath, bitrate) // make it queueueueueueu
+
 								})
 								.then((convertedFile) => {
 									//TODO  delete mp4 file here
