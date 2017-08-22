@@ -39,21 +39,21 @@ class MusicPlayer {
     const self = this;
     return new Promise((resolve, reject) => {
       const filePath = path.join(this.sourceDir, playlist, name)
-      const command = `soxi '${filePath}'`
-      let fileData = ''
-      const soxi = exec(command)
-      soxi.stdout.pipe(process.stdout)
-      soxi.stdout.on('data', (data) => {
-        fileData += data.toString();
-      })
-      soxi.stdout.on('end', (data) => {
-        const duration = self._parseTimeInfo(fileData.match(/\d\d:\d\d:\d\d.\d\d/)[0]);
+      // const command = `soxi '${filePath}'`
+      // let fileData = ''
+      // const soxi = exec(command)
+      // soxi.stdout.pipe(process.stdout)
+      // soxi.stdout.on('data', (data) => {
+      //   fileData += data.toString();
+      // })
+      // soxi.stdout.on('end', (data) => {
+        //const duration = self._parseTimeInfo(fileData.match(/\d\d:\d\d:\d\d.\d\d/)[0]);
         resolve({
           name,
           duration,
           path: filePath
         })
-      })
+      //})
     })
   }
   _readMusicInfo() {
