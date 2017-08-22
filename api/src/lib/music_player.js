@@ -61,7 +61,12 @@ class MusicPlayer {
     const playlists = fs.readdirSync(this.sourceDir);
     console.log('readdirSync', playlists)
     return Promise.all(
-        playlists.map((playlist) => {
+        playlists
+        .filter((playlist) => {
+        	return fs.statSync(path.join(this.sourceDir, playlist)).isDirectory()
+        })
+        .map((playlist) => {
+        	console.log(playlist)
           const songs = fs.readdirSync(path.join(self.sourceDir, playlist))
           return Promise.all(songs.map((song) => {
               return self._getFileInfo(playlist, song)
