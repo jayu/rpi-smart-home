@@ -94,5 +94,3 @@ class SoundPlayer {
 module.exports = {
   SoundPlayer: new SoundPlayer()
 }
-
-
