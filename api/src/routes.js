@@ -12,7 +12,7 @@ const MusicPlayer = require('./lib/music_player.js')
 
 const { downloadFromYoutube, updateSpotifySongs } = require('./lib/youtubify.js')
 
-//const music_player = new MusicPlayer(path.join(__dirname, "res/music"));
+const music_player = new MusicPlayer(path.join(__dirname, "res/music"));
 
 monitorTemp()
 setInterval(monitorTemp, 29*60*1000)
