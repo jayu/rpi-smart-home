@@ -26,6 +26,7 @@ class MusicPlayer {
       .then((musicInfo) => {
         this.musicInfo = musicInfo
       })
+	.catch((err) => {console.log(err)})
   }
   _parseTimeInfo(time) {
     time = time.split(":");
@@ -50,7 +51,7 @@ class MusicPlayer {
         //const duration = self._parseTimeInfo(fileData.match(/\d\d:\d\d:\d\d.\d\d/)[0]);
         resolve({
           name,
-          duration,
+          //duration,
           path: filePath
         })
       //})
@@ -58,13 +59,15 @@ class MusicPlayer {
   }
   _readMusicInfo() {
     const self = this
-    const playlists = fs.readdirSync(this.sourceDir);
+    const playlists = fs.readdirSync(this.sourceDir).filter((playlist) => {
+        	return fs.statSync(path.join(this.sourceDir, playlist)).isDirectory()
+        })
     console.log('readdirSync', playlists)
     return Promise.all(
         playlists
-        .filter((playlist) => {
-        	return fs.statSync(path.join(this.sourceDir, playlist)).isDirectory()
-        })
+        //.filter((playlist) => {
+        //	return fs.statSync(path.join(this.sourceDir, playlist)).isDirectory()
+        //})
         .map((playlist) => {
         	console.log(playlist)
           const songs = fs.readdirSync(path.join(self.sourceDir, playlist))
@@ -77,6 +80,7 @@ class MusicPlayer {
         }))
       .then((music) => {
         console.log('hasMusicInfo')
+	console.log(music)
         const musicInfo = {
           playlists: {}
         }
