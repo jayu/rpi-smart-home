@@ -38,6 +38,7 @@ let _ip = env.NODE_IP || ip()[0] || 'localhost'// '192.168.8.107';
 app.listen(port, _ip , () => {
     console.log(`Smart Home is running at: http://${_ip}:${port}/`)
     lcd.init(() => {
-      lcd.writeString(_ip)
+	console.log('LCD initialized')
+      lcd.writeString([`${_ip}:${port}`])
     })
 });

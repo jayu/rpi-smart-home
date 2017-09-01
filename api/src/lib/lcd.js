@@ -36,16 +36,17 @@ const PromiseQueue = (actions) => {
   })
 }
 var displayPorts = {
-  RS: 32,
-  E: 24,
-  D4: 22,
-  D5: 23,
-  D6: 18,
-  D7: 19,
+  RS: 38,
+  E: 40,
+  D4: 33,
+  D5: 35,
+  D6: 37,
+  D7: 36,
 
   CHR: 1,
   CMD: 0
 };
+
 
 function LCD(displayConfig) {
   displayConfig = displayConfig || {};
@@ -105,6 +106,7 @@ LCD.prototype.init = function(callback) {
 };
 LCD.prototype._initDisplay = function() {
   const self = this;
+	self._sleep(0.1)
   return PromiseQueue([
     (() => { return self.writeByte(0x33, displayPorts.CMD) }),
     (() => { return self.writeByte(0x32, displayPorts.CMD) }),
