@@ -14,7 +14,8 @@ const http        = require('http'),
       fileUpload = require('express-fileupload'),
       app = express(),
       expressWs = require('express-ws')(app),
-      {ip} = require('./src/utils');
+      {ip} = require('./src/utils'),
+      lcd = require('./src/lib/lcd');
 
 /* CONFIG */
 
@@ -36,4 +37,7 @@ let _ip = env.NODE_IP || ip()[0] || 'localhost'// '192.168.8.107';
 
 app.listen(port, _ip , () => {
     console.log(`Smart Home is running at: http://${_ip}:${port}/`)
+    lcd.init(() => {
+      lcd.writeString(_ip)
+    })
 });
