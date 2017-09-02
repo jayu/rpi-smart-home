@@ -1,7 +1,6 @@
 /*
 TODO
 - export all gpio setup to separated file
-- constructor LCD with number of pins etc.
 - module display to manage displaying screens: welcome, general info, music player, videoplayer, 
 - button to show general screen for a 5 sec when i.e music is playing
 - lcd display styles , left, center
@@ -9,7 +8,9 @@ TODO
 */
 
 const gpio = require('rpi-gpio')
-var sleep = require('sleep');
+const sleep = require('sleep');
+const { PromiseQueue } = require('./utils') 
+
 const SetupOut = (pin) => {
   return new Promise((resolve, reject) => {
     gpio.setup(pin, gpio.DIR_OUT, () => { resolve() })
@@ -21,44 +22,17 @@ const Write = (pin) => (value) => {
   })
 
 }
-const PromiseQueue = (actions) => {
-  return new Promise((resolve, reject) => {
-    const execute = () => {
-      return actions.shift()().then(() => {
-        if (actions.length > 0) {
-          return execute()
-        } else {
-          resolve()
-        }
-      })
-    }
-    execute()
-  })
-}
-var displayPorts = {
-  RS: 38,
-  E: 40,
-  D4: 33,
-  D5: 35,
-  D6: 37,
-  D7: 36,
 
-  CHR: 1,
-  CMD: 0
-};
-
-
-function LCD(displayConfig) {
+function LCD(portNumbers) {
   displayConfig = displayConfig || {};
 
   this._displayConfig = {
-    width: displayConfig.width || 20,
+    width: 20,
     lines: [0x80, 0x80 | 0x40, 0x80 | 0x14, 0x80 | 0x54],
-
-    pulse: displayConfig.pulse || 0.0001,
-    delay: displayConfig.delay || 0.0001
+    pulse: 0.0001,
+    delay: 0.0001
   };
-
+  this._portsNumbers = portNumbers;
   this._ports = {
     rs: null,
     e: null,
@@ -67,6 +41,14 @@ function LCD(displayConfig) {
     d6: null,
     d7: null
   };
+  this._commands = {
+    CLEAR : 0x01,
+
+  }
+  this._mode = {
+    CHR : 1,
+    CMD : 0
+  }
 }
 
 LCD.prototype._sleep = function(seconds) {
@@ -78,21 +60,21 @@ LCD.prototype.init = function(callback) {
   const self = this;
   console.log('init')
   Promise.all([
-      SetupOut(displayPorts.D4),
-      SetupOut(displayPorts.D5),
-      SetupOut(displayPorts.D6),
-      SetupOut(displayPorts.D7),
-      SetupOut(displayPorts.E),
-      SetupOut(displayPorts.RS),
+      SetupOut(self._portsNumbers.D4),
+      SetupOut(self._portsNumbers.D5),
+      SetupOut(self._portsNumbers.D6),
+      SetupOut(self._portsNumbers.D7),
+      SetupOut(self._portsNumbers.E),
+      SetupOut(self._portsNumbers.RS),
     ])
     .then(() => {
       console.log('setup')
-      self._ports.d4 = Write(displayPorts.D4)
-      self._ports.d5 = Write(displayPorts.D5)
-      self._ports.d6 = Write(displayPorts.D6)
-      self._ports.d7 = Write(displayPorts.D7)
-      self._ports.e = Write(displayPorts.E)
-      self._ports.rs = Write(displayPorts.RS)
+      self._ports.d4 = Write(self._portsNumbers.D4)
+      self._ports.d5 = Write(self._portsNumbers.D5)
+      self._ports.d6 = Write(self._portsNumbers.D6)
+      self._ports.d7 = Write(self._portsNumbers.D7)
+      self._ports.e = Write(self._portsNumbers.E)
+      self._ports.rs = Write(self._portsNumbers.RS)
       return true
     })
     .then(() => {
@@ -107,14 +89,14 @@ LCD.prototype.init = function(callback) {
 LCD.prototype._initDisplay = function() {
   const self = this;
 	self._sleep(0.1)
+  // initial bytes sequence
   return PromiseQueue([
-    (() => { return self.writeByte(0x33, displayPorts.CMD) }),
-    (() => { return self.writeByte(0x32, displayPorts.CMD) }),
-    (() => { return self.writeByte(0x28, displayPorts.CMD) }),
-    (() => { return self.writeByte(0x0C, displayPorts.CMD) }),
-    (() => { return self.writeByte(0x06, displayPorts.CMD) }),
-    (() => { return self.writeByte(0x01, displayPorts.CMD) }),
-  ])
+    (() => { return self.writeByte(0x33, self._mode.CMD) }), // ?
+    (() => { return self.writeByte(0x32, self._mode.CMD) }), // ?
+    (() => { return self.writeByte(0x28, self._mode.CMD) }), // ?
+    (() => { return self.writeByte(0x0C, self._mode.CMD) }), // display on, cursor off, cursor blink off
+    (() => { return self.writeByte(0x06, self._mode.CMD) }), // left to right, no shift
+    (() => { return self.writeByte(self._commands.CLEAR, self._mode.CMD) }), // clear display
 };
 
 LCD.prototype._clean = function() {
@@ -123,14 +105,14 @@ LCD.prototype._clean = function() {
   }
 };
 LCD.prototype.clear = function() {
-	return this.writeByte(0x01, displayPorts.CMD)
+	return this.writeByte(this._commands.CLEAR, this._mode.CMD)
 }
 LCD.prototype.shutdown = function() {
   // this.writeString("\n");
   this._clean();
 };
 
-LCD.prototype.writeString = function(strings, center = false) {
+LCD.prototype.writeString = function(strings, center = true) {
   const self = this
   var lines = this._displayConfig.lines
   const linesActions = []
@@ -145,13 +127,13 @@ LCD.prototype.writeString = function(strings, center = false) {
   }
   for (let i = 0; i < strings.length; i++) {
     linesActions.push(() => {
-      return self.writeByte(lines[i], displayPorts.CMD).
+      return self.writeByte(lines[i], self._mode.CMD).
       then(() => {
         const charsActions = []
         for (let j = 0; j < strings[i].length; j++) {
           const c = strings[i].charCodeAt(j) || 0x20;
           charsActions.push(() => {
-            return self.writeByte(c, displayPorts.CHR);
+            return self.writeByte(c, self._mode.CHR);
           })
         }
         return PromiseQueue(charsActions)
@@ -206,13 +188,13 @@ LCD.prototype.writeByte = function(bits, mode) {
     })
 };
 
-var lcd = new LCD();
-
-// lcd.init(function() {
-//   console.log('inited')
-//   lcd.writeString(['linia 1', 'linia 2', 'linia 3' ,'linia 4'])
-//     .then(() => {})
-//   //lcd.shutdown();
-// })
+var lcd = new LCD({
+  RS: 38,
+  E: 40,
+  D4: 33,
+  D5: 35,
+  D6: 37,
+  D7: 36,
+});
 
 module.exports = lcd

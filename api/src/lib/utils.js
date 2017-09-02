@@ -143,6 +143,22 @@ const readFileAsJSON = (_path) => {
 const saveObjectToFile = (_path, data) => {
 	return fs.writeFileSync(_path, JSON.stringify(data))
 }
+
+const PromiseQueue = (actions) => {
+  return new Promise((resolve, reject) => {
+    const execute = () => {
+      return actions.shift()().then(() => {
+        if (actions.length > 0) {
+          return execute()
+        } else {
+          resolve()
+        }
+      })
+    }
+    execute()
+  })
+}
+
 module.exports = {
 	deleteFolderRecursive,
 	rateVideo,
@@ -152,5 +168,6 @@ module.exports = {
 	logError,
 	comparePlaylists,
 	readFileAsJSON,
-	saveObjectToFile
+	saveObjectToFile,
+	PromiseQueue
 }
