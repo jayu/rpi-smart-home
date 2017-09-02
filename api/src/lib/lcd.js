@@ -24,8 +24,6 @@ const Write = (pin) => (value) => {
 }
 
 function LCD(portNumbers) {
-  displayConfig = displayConfig || {};
-
   this._displayConfig = {
     width: 20,
     lines: [0x80, 0x80 | 0x40, 0x80 | 0x14, 0x80 | 0x54],
@@ -56,10 +54,10 @@ LCD.prototype._sleep = function(seconds) {
 };
 
 
-LCD.prototype.init = function(callback) {
+LCD.prototype.init = function() {
   const self = this;
   console.log('init')
-  Promise.all([
+  return Promise.all([
       SetupOut(self._portsNumbers.D4),
       SetupOut(self._portsNumbers.D5),
       SetupOut(self._portsNumbers.D6),
@@ -80,10 +78,6 @@ LCD.prototype.init = function(callback) {
     .then(() => {
       console.log('init display')
       return self._initDisplay();
-
-    })
-    .then(() => {
-      callback.call(this);
     })
 };
 LCD.prototype._initDisplay = function() {
@@ -97,6 +91,7 @@ LCD.prototype._initDisplay = function() {
     (() => { return self.writeByte(0x0C, self._mode.CMD) }), // display on, cursor off, cursor blink off
     (() => { return self.writeByte(0x06, self._mode.CMD) }), // left to right, no shift
     (() => { return self.writeByte(self._commands.CLEAR, self._mode.CMD) }), // clear display
+  ])
 };
 
 LCD.prototype._clean = function() {
