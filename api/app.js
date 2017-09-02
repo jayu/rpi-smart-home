@@ -39,6 +39,11 @@ app.listen(port, _ip , () => {
     console.log(`Smart Home is running at: http://${_ip}:${port}/`)
     lcd.init(() => {
 	console.log('LCD initialized')
-      lcd.writeString([`${_ip}:${port}`])
+      lcd.writeString(['Hello',`${_ip}:${port}`, 'Have a nice day'])
+	setTimeout(() => {
+		lcd.clear().then(() => {
+			lcd.writeString(['test'])
+		})
+	}, 3000)
     })
 });

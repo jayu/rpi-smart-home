@@ -122,16 +122,27 @@ LCD.prototype._clean = function() {
     this._ports[key].unexport();
   }
 };
-
+LCD.prototype.clear = function() {
+	return this.writeByte(0x01, displayPorts.CMD)
+}
 LCD.prototype.shutdown = function() {
   // this.writeString("\n");
   this._clean();
 };
 
-LCD.prototype.writeString = function(strings) {
+LCD.prototype.writeString = function(strings, center = false) {
   const self = this
   var lines = this._displayConfig.lines
   const linesActions = []
+  if (center) {
+	strings = strings.map((string) => {
+		let spaces = ''
+		for(let i = 0; i < (this._displayConfig.width - string.length) / 2; i++) {
+			spaces += ' '
+		}
+		return spaces + string
+	})
+  }
   for (let i = 0; i < strings.length; i++) {
     linesActions.push(() => {
       return self.writeByte(lines[i], displayPorts.CMD).
