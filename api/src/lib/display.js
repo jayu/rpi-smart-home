@@ -15,7 +15,7 @@ class Display {
 			return lcd.writeString(['Welcome', ip(), 'Have a nice day :)', '      Yours Karaluch'])
 		})
 		.then(() => {
-			setTimeout(self.idle, 5000)
+			setTimeout(self.idle, 10000)
 		})
 	}
 	idle() {
