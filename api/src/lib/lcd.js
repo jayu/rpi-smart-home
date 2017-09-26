@@ -108,6 +108,7 @@ LCD.prototype.shutdown = function() {
 };
 
 LCD.prototype.writeString = function(strings, center = true) {
+  console.log(strings)
   const self = this
   var lines = this._displayConfig.lines
   const linesActions = []
@@ -143,7 +144,7 @@ LCD.prototype.writeString = function(strings, center = true) {
 
 LCD.prototype.writeByte = function(bits, mode) {
   const self = this;
-  console.log('writing byte', bits, mode)
+  //console.log('writing byte', bits, mode)
   return Promise.all([
       self._ports.rs(mode),
       self._ports.d4((bits & 0x10) == 0x10),
