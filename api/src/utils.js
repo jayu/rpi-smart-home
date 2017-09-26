@@ -10,5 +10,4 @@ const parseBoolean = (value) => {
 
 module.exports = {
 	parseBoolean,
-	ip,
 }
