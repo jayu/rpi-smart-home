@@ -65,7 +65,7 @@ class SoundPlayer {
     } else {
       console.log('playing next: empty queue or player in use')
     }
-
+  }
   
   play(sound) {
     return this._addToQueue(sound.constructor == Array ? sound : [sound])
