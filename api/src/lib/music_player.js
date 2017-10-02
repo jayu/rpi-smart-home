@@ -142,10 +142,10 @@ class MusicPlayer {
     if (args.playlist) { // one song per one SoundPlayer.play - allow other sounds ex. system info be played between songs
       //once the song finished, promise is resolved and next song is playing
       // here just create playQueue of songs and fire _playQueue
+      this._setQueue(this.musicInfo.playlists[args.playlist].map((song) => (song.path)))
       if (this.shuffle) {
         this.currentQueueIndex = ~~(this.queue.length * Math.random())
       }
-      this._setQueue(this.musicInfo.playlists[args.playlist].map((song) => (song.path)))
       if (this.queue.length > 0) {
         this._playQueue();
       }
@@ -154,10 +154,11 @@ class MusicPlayer {
   }
   pause() { 
     this.currentSoundPausedAt = this.currentSoundPausedAt + Date.now() - this.currentSoundStart // previous paused + interval
+    this.stop()
   }
   resume() {
     const song = [this.queue[this.currentQueueIndex], 'trim', ~~(this.currentSoundPausedAt/1000)]
-    this.currentSound.replace(song)
+    this.currentSound.play(song)
       .then(this._setCurrentSound.bind(this))
       .then(this._playbackEnd.bind(this))
   }
