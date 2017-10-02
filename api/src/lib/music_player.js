@@ -28,6 +28,7 @@ class MusicPlayer {
     this._readMusicInfo()
       .then((musicInfo) => {
         this.musicInfo = musicInfo
+        console.log('musicInfo', musicInfo)
       })
 	.catch((err) => {console.log(err)})
   }
@@ -60,6 +61,7 @@ class MusicPlayer {
               return self._getFileInfo(playlist, song)
             }))
             .then((songsInfo) => {
+              console.log(songsInfo)
               return songsInfo
             })
         }))
