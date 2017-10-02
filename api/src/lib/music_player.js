@@ -158,7 +158,7 @@ class MusicPlayer {
   }
   resume() {
     const song = [this.queue[this.currentQueueIndex], 'trim', ~~(this.currentSoundPausedAt/1000)]
-    this.currentSound.play(song)
+    SoundPlayer.play.play(song)
       .then(this._setCurrentSound.bind(this))
       .then(this._playbackEnd.bind(this))
   }
