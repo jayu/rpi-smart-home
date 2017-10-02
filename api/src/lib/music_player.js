@@ -23,7 +23,6 @@ class MusicPlayer {
     this.currentSoundStart = 0;
     this.currentSoundPausedAt = 0;
     this.currentSound = {};
-    this.currnetSong = {};
     this.shuffle = true;
     this.repeat = true //false;
     this.getFileInfoTaskQueue = new TaskQueue((songPath) => {
@@ -88,6 +87,8 @@ class MusicPlayer {
   }
   _setQueue(songs) {
     this.currentQueueIndex = 0;
+    this.currentSoundStart = 0;
+    this.currentSoundPausedAt = 0;
     this.queue = songs;
   }
   _setCurrentSound(currentSound) {
