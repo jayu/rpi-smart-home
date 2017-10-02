@@ -29,7 +29,7 @@ class MusicPlayer {
     this.getFileInfoTaskQueue = new TaskQueue((songPath) => {
       return new Promise((resolve, reject) => {
         mp3Length(songPath, (err,duration) => {
-          console.log(song, err, duration)
+          console.log(songPath, err, duration)
           resolve(duration)
         })
       })
