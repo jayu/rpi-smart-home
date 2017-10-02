@@ -154,15 +154,27 @@ module.exports = () => {
             songLike : req.body.songLike,
             song : req.body.song
         })
-	res.send('done')
+	   res.send('done')
+    })
+    api.post('/musicPlayer/pause', function (req, res) {
+        music_player.pause()
+        res.send('done')
+    })
+    api.post('/musicPlayer/resume', function (req, res) {
+        music_player.resume()
+        res.send('done')
     })
     api.post('/musicPlayer/stop', function (req, res) {
         music_player.stop()
-	res.send('done')
+        res.send('done')
+    })
+    api.post('/musicPlayer/prev', function (req, res) {
+        music_player.prev()
+        res.send('done')
     })
     api.post('/musicPlayer/next', function (req, res) {
         music_player.next()
-	res.send('done')
+	   res.send('done')
     })
 
     api.get('/videoTest', function (req, res) {
