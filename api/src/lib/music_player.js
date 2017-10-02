@@ -2,7 +2,8 @@ const fs = require('fs');
 const path = require('path')
 const { spawn, exec } = require('child_process')
 const { SoundPlayer } = require('./sound_player.js')
-const mp3Duration = require('mp3-duration');
+const { TaskQueue } = require('./utils.js')
+const mp3Length = require('mp3-length');
 
 
 /* 
@@ -25,6 +26,14 @@ class MusicPlayer {
     this.currnetSong = {};
     this.shuffle = true;
     this.repeat = true //false;
+    this.getFileInfoTaskQueue = new TaskQueue((songPath) => {
+      return new Promise((resolve, reject) => {
+        mp3Length(songPath, (err,duration) => {
+          console.log(song, err, duration)
+          resolve(duration)
+        })
+      })
+    }, 'getFileInfo')
     this._readMusicInfo()
       .then((musicInfo) => {
         this.musicInfo = musicInfo
@@ -37,8 +46,7 @@ class MusicPlayer {
     const self = this;
     return new Promise((resolve, reject) => {
       const filePath = path.join(this.sourceDir, playlist, name)
-      
-      mp3Duration(filePath, function (err, duration) {
+      this.getFileInfoTaskQueue.add(filePath, (duration) => {
         resolve({
           name,
           duration : duration*1000,
