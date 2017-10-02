@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path')
 const { spawn, exec } = require('child_process')
 const { SoundPlayer } = require('./sound_player.js')
+const mp3Duration = require('mp3-duration');
 
 
 /* 
@@ -18,9 +19,11 @@ class MusicPlayer {
     this.musicInfo = {};
     this.queue = [];
     this.currentQueueIndex = 0;
+    this.currentSoundStart = 0;
+    this.currentSoundPausedAt = 0;
     this.currentSound = {};
     this.currnetSong = {};
-    this.shuffle = false;
+    this.shuffle = true;
     this.repeat = true //false;
     this._readMusicInfo()
       .then((musicInfo) => {
@@ -28,33 +31,19 @@ class MusicPlayer {
       })
 	.catch((err) => {console.log(err)})
   }
-  _parseTimeInfo(time) {
-    time = time.split(":");
-    time = (time.slice(0, 2).concat(time[2].split(".")))
-    //console.log(time);
-    //console.log(time.map(parseInt));
-    //time = time.map(parseInt)
-    return time[0] * 1000 * 60 * 60 + time[1] * 1000 * 60 + time[2] * 1000 + time[3]
-  }
+  
   _getFileInfo(playlist, name) {
     const self = this;
     return new Promise((resolve, reject) => {
       const filePath = path.join(this.sourceDir, playlist, name)
-      // const command = `soxi '${filePath}'`
-      // let fileData = ''
-      // const soxi = exec(command)
-      // soxi.stdout.pipe(process.stdout)
-      // soxi.stdout.on('data', (data) => {
-      //   fileData += data.toString();
-      // })
-      // soxi.stdout.on('end', (data) => {
-        //const duration = self._parseTimeInfo(fileData.match(/\d\d:\d\d:\d\d.\d\d/)[0]);
+      
+      mp3Duration(filePath, function (err, duration) {
         resolve({
           name,
-          //duration,
+          duration : duration*1000,
           path: filePath
         })
-      //})
+      })
     })
   }
   _readMusicInfo() {
@@ -62,12 +51,8 @@ class MusicPlayer {
     const playlists = fs.readdirSync(this.sourceDir).filter((playlist) => {
         	return fs.statSync(path.join(this.sourceDir, playlist)).isDirectory()
         })
-    console.log('readdirSync', playlists)
     return Promise.all(
         playlists
-        //.filter((playlist) => {
-        //	return fs.statSync(path.join(this.sourceDir, playlist)).isDirectory()
-        //})
         .map((playlist) => {
         	console.log(playlist)
           const songs = fs.readdirSync(path.join(self.sourceDir, playlist))
@@ -79,8 +64,6 @@ class MusicPlayer {
             })
         }))
       .then((music) => {
-        console.log('hasMusicInfo')
-	console.log(music)
         const musicInfo = {
           playlists: {}
         }
@@ -99,16 +82,28 @@ class MusicPlayer {
   }
   _setCurrentSound(currentSound) {
     this.currentSound = currentSound;
+    this.currentSoundStart = Date.now()
     console.log('currentSound', currentSound)
     return currentSound.endPromise
   }
   _setNextSongIndex() {
-    if (this.shuffle) { //repeat inculuded
+    this.currentSoundPausedAt = 0;
+    if (this.shuffle) { 
       this.currentQueueIndex = ~~(this.queue.length * Math.random())
     } else if (this.repeat && this.currentQueueIndex == this.queue.length - 1) {
       this.currentQueueIndex = 0;
     } else {
       this.currentQueueIndex++;
+    }
+  }
+  _setPrevSongIndex() {
+    this.currentSoundPausedAt = 0;
+    if (this.shuffle) { 
+      this.currentQueueIndex = this.currentQueueIndex // just for readability
+    } else if (this.repeat && this.currentQueueIndex == 0) {
+      this.currentQueueIndex = this.queue.length - 1
+    } else {
+      this.currentQueueIndex--;
     }
   }
   _playbackEnd(code) {
@@ -121,6 +116,7 @@ class MusicPlayer {
     }
   }
   _playQueue() { // recursive playing songs from playQueue
+    this.currentSoundPausedAt = 0;
     SoundPlayer.play(this.queue[this.currentQueueIndex])
       .then(this._setCurrentSound.bind(this))
       .then(this._playbackEnd.bind(this))
@@ -143,8 +139,14 @@ class MusicPlayer {
 
     }
   }
-  pasue() { //later need to play trimmed sound
-
+  pasue() { 
+    this.currentSoundPausedAt = this.currentSoundPausedAt + Date.now() - this.currentSoundStart // previous paused + interval
+  }
+  resume() {
+    const song = [this.queue[this.currentQueueIndex], 'trim', ~~(this.currentSoundPausedAt/1000)]
+    this.currentSound.replace(song)
+      .then(this._setCurrentSound.bind(this))
+      .then(this._playbackEnd.bind(this))
   }
   stop() { //kill current song
     console.log('killing current song', this.currentSound)
@@ -157,7 +159,16 @@ class MusicPlayer {
       .then(this._playbackEnd.bind(this))
   }
   prev() {
-  	
+  	this._setPrevSongIndex()
+    this.currentSound.replace(this.queue[this.currentQueueIndex])
+      .then(this._setCurrentSound.bind(this))
+      .then(this._playbackEnd.bind(this))
+  }
+  setRepeat(repeat) {
+  	this.repeat = !!repeat
+  }
+  setShuffle(shuffle) {
+  	this.shuffle = !!shuffle
   }
 }
 module.exports = MusicPlayer;

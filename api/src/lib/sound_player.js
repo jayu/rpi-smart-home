@@ -66,26 +66,7 @@ class SoundPlayer {
       console.log('playing next: empty queue or player in use')
     }
 
-  }
-  _joinSounds(soundArr) {
-    let command = '';
-    for (let i = 0; i < soundArr.length - 1; i++) {
-      command += `play '${soundArr[i]}' && `;
-    }
-    command += `play '${soundArr[soundArr.length-1]}'`
-
-    return command;
-  }
-  _soundToCommand(sound) {
-    let command = '';
-    if (sound.constructor == Array) {
-      console.log('joining sounds');
-      command = this._joinSounds(sound)
-    } else {
-      command = `play '${sound}'`
-    }
-    return command;
-  }
+  
   play(sound) {
     return this._addToQueue(sound.constructor == Array ? sound : [sound])
   }
