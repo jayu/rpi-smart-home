@@ -71,7 +71,7 @@ class SoundPlayer {
   setVolume(vol) {
     this.volume = vol;
     return new Promise((resolve, reject) => {
-      const setVol = exec(`amixer -c 1 set Speaker ${vol}%`)
+      const setVol = exec(`amixer -c 1 set Speaker ${vol}% -M`)
       setVol.on('exit', () => {
         resolve()
       })
