@@ -185,5 +185,8 @@ class MusicPlayer {
   setShuffle(shuffle) {
   	this.shuffle = !!shuffle
   }
+  setVolume(volume) {
+    return SoundPlayer.setVolume(volume)
+  }
 }
 module.exports = MusicPlayer;

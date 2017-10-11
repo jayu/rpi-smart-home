@@ -12,6 +12,8 @@ class SoundPlayer {
   constructor() {
     this.queue = []; // {command, resolve}
     this.currentPlaying = false;
+    this.volume = 50;
+    this.setVolume(this.volume)
   }
   _addToQueue(songs) {
     return new Promise((resolve, reject) => {
@@ -66,7 +68,18 @@ class SoundPlayer {
       console.log('playing next: empty queue or player in use')
     }
   }
-  
+  setVolume(vol) {
+    this.volume = vol;
+    return new Promise((resolve, reject) => {
+      const setVol = exec(`amixer -c 1 set Speaker ${vol}%`)
+      setVol.on('exit', () => {
+        resolve()
+      })
+    })
+  }
+  getVolume() {
+    return this.volume
+  }
   play(sound) {
     return this._addToQueue(sound.constructor == Array ? sound : [sound])
   }

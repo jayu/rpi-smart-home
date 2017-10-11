@@ -1,0 +1,11 @@
+.MusicPlayer {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	button {
+		padding: 15px;
+		font-size: 1.2rem;
+		margin: 10px;
+	}
+}
