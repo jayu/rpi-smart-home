@@ -6,6 +6,15 @@ export const setPlaylistsInfo = (playlists) => ({
 	type : actionTypes.SET_PLAYLISTS,
 	playlists
 })
+export const setCurrentSong = (songName) => ({
+	type : actionTypes.SET_CURRENT_SONG,
+	songName
+})
+
+export const setPlaybackState = (state) => ({
+	type : actionTypes.SET_PLAYBACK_STATE,
+	state
+})
 
 /* Async actions */
 export const getMusicInfo = () => async (dispatch, getState) => {
@@ -13,17 +22,29 @@ export const getMusicInfo = () => async (dispatch, getState) => {
 	dispatch(setPlaylistsInfo(musicInfo.data.playlists))
 
 }
-export const playSong = (playlist, songName) => (dispatch, getState) => {
+export const playSong = (playlist, songName) => async (dispatch, getState) => {
 	console.log(playlist, songName)
 	const url = `http://${location.host}/api/musicPlayer/play`
-	axios.post(url, {
+	await axios.post(url, {
 		playlist,
 		songName,
 	})
+	dispatch(setCurrentSong(songName))
 }
-export const playPlaylist = (playlist) => (dispatch, getState) => {
+export const playPlaylist = (playlist) => async (dispatch, getState) => {
 	const url = `http://${location.host}/api/musicPlayer/play`
-	axios.post(url, {
+	await axios.post(url, {
 		playlist,
 	})
+	dispatch(setCurrentSong(songName))
+}
+export const pausePlayback = () => async (dispatch, getState) => {
+	const url = `http://${location.host}/api/musicPlayer/pause`
+	await axios.post(url)
+	dispatch(setPlaybackState('paused'))
+}
+export const resumePlayback = () => async (dispatch, getState) => {
+	const url = `http://${location.host}/api/musicPlayer/resume`
+	await axios.post(url)
+	dispatch(setPlaybackState('playing'))	
 }

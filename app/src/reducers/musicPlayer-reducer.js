@@ -7,28 +7,23 @@ const initialState = {
 	shuffle : false,
 	random : false,
 	volume : .5,// 0-1	
-	playbackState : "", //"playing, paused, stopped"
+	playbackState : "paused", //"playing, paused"
 	playStartTime : null,
 	songStartedAt : 0, //
-}
-initialState.playlists = {
-	"trap" : [
-		{name : "21 savavge - ads", duration : 3000},
-		{name : "Michael - testoviron", duration : 3000},
-		{name : "21 savage - axcvds", duration : 3000},
-	],
-	"chill" : [
-		{name : "21 savage - vads", duration : 3000},
-		{name : "21 savagve - ads", duration : 3000},
-		{name : "21 savavge - ads", duration : 3000},
-	]
 }
 const musicPlayerReducer = (state = initialState, action) => {
 	console.log('musicPlayerReducer')
 	switch (action.type) {
 		case types.SET_PLAYLISTS: {
-			console.log('setting playlists')
 			return {...state, playlists : action.playlists}
+		}
+		case types.SET_CURRENT_SONG: {
+			console.log('setting currentSong')
+			return {...state, currentSongTitle : action.songName, playbackState : 'playing'}
+		}
+		case types.SET_PLAYBACK_STATE: {
+			console.log('setting SET_PLAYBACK_PAUSE')
+			return {...state, playbackState : action.state}
 		}
 		default : {
 			return state
