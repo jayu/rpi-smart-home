@@ -14,7 +14,7 @@ export const getMusicInfo = () => async (dispatch, getState) => {
 
 }
 export const playSong = (playlist, songName) => (dispatch, getState) => {
-	console.log(playlistName, songName)
+	console.log(playlist, songName)
 	const url = `http://${location.host}/api/musicPlayer/play`
 	axios.post(url, {
 		playlist,

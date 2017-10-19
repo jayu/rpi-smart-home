@@ -76312,7 +76312,7 @@ var Example = Example || {}; Example["module"] =
 	};
 	var playSong = exports.playSong = function playSong(playlist, songName) {
 		return function (dispatch, getState) {
-			console.log(playlistName, songName);
+			console.log(playlist, songName);
 			var url = 'http://' + location.host + '/api/musicPlayer/play';
 			_axios2.default.post(url, {
 				playlist: playlist,
