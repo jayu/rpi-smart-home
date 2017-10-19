@@ -7,9 +7,8 @@ const mp3Length = require('mp3-length');
 
 
 /* 
-	co z przewijaniem, co z czasem piosenki ? 
-	 - czytanie postępu z output streamu lub na początek ustawienie timeoutu po odczytaniu danych (czasu trwania) piosenki ?
-	 - (?) odpalanie z określonym czasem
+	
+  - stop current playlis when changes check it
 */
 
 
@@ -27,10 +26,15 @@ class MusicPlayer {
     this.repeat = true //false;
     this.getFileInfoTaskQueue = new TaskQueue((songPath) => {
       return new Promise((resolve, reject) => {
-        mp3Length(songPath, (err,duration) => {
-          console.log(songPath, err, duration)
-          resolve(duration)
-        })
+        if (require('os').userInfo().username != "ASUS") {
+          mp3Length(songPath, (err,duration) => {
+            console.log(songPath, err, duration)
+            resolve(duration)
+          })
+        }
+        else {
+          resolve(3)
+        }
       })
     }, 'getFileInfo')
     this._readMusicInfo()
@@ -133,20 +137,23 @@ class MusicPlayer {
       .then(this._playbackEnd.bind(this))
   }
   play(args) {
-    // args = {
-    // 	playlist : '', // playlist id
-    // 	song : '', // song id
-    // 	songLike : '', // string 
-    // }
-    console.log(args);
-    //console.log(this.musicInfo)
     if (args.playlist) { // one song per one SoundPlayer.play - allow other sounds ex. system info be played between songs
       //once the song finished, promise is resolved and next song is playing
       // here just create playQueue of songs and fire _playQueue
-      this._setQueue(this.musicInfo.playlists[args.playlist].map((song) => (song.path)))
-      if (this.shuffle) {
+      this.stop()
+      const currentPlayList = [...this.musicInfo.playlists[args.playlist]]
+      if (args.songName) {
+        const i = currentPlayList.findIndex((song) => {
+          return args.songName == song.name
+        })
+        currentPlayList.unshift(currentPlayList.splice(i,1)[0]) // remove element and set at start
+      }
+      this._setQueue(currentPlayList.map((song) => (song.path)))
+
+      if (args.songName == undefined && this.shuffle) {
         this.currentQueueIndex = ~~(this.queue.length * Math.random())
       }
+
       if (this.queue.length > 0) {
         this._playQueue();
       }
@@ -165,7 +172,9 @@ class MusicPlayer {
   }
   stop() { //kill current song
     console.log('killing current song', this.currentSound)
-    this.currentSound.kill();
+    if (this.currentSound.kill) {
+      this.currentSound.kill();
+    }
   }
   next() {
     this._setNextSongIndex()

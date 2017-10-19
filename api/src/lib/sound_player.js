@@ -39,7 +39,7 @@ class SoundPlayer {
       const currentProcess = execFile('play', songs)
 
       currentProcess.stdout.pipe(process.stdout);
-      currentProcess.stderr.pipe(process.stderr);
+      //currentProcess.stderr.pipe(process.stderr);
 
       const endPromise = new Promise((resolve, reject) => {
         resolveEnd = resolve

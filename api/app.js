@@ -26,8 +26,12 @@ app.use(express.static(path.join(__dirname, '../app/build')));
 
 /* APP ROUTING */
 
-app.use('/api', require('./src/routes.js')());
+app.use('/api', require('./src/routes/index.js')());
+app.use('/api/musicPlayer', require('./src/routes/musicPlayer.js')())
 
+app.use(function(req,res){
+  res.redirect('/')
+});
 
 /* BOOT */
 

@@ -1,5 +1,5 @@
 {
-  "name": "Forgotten_Scrapper",
+  "name": "Smart_home_app",
   "version": "1.0.0",
   "scripts": {
     "build": "webpack --progress --profile --colors",

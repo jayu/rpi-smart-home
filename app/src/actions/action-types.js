@@ -15,3 +15,6 @@ export const SET_TEMPERATURE_LIST = 'SET_TEMPERATURE_LIST'
 /* coffeeMachine actions */
 
 /* not required yet */
+
+/* music player actions */
+

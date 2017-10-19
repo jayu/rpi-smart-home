@@ -4,16 +4,15 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const querystring = require('querystring');
-const { WS, filterInactiveClients, websocketClients, sendToAll } = require('./ws')
-const gpio = require('./gpio')
-const { parseBoolean } = require('./utils')
-const { play, getTemp, monitorTemp } = require('./play_temperature')
-const MusicPlayer = require('./lib/music_player.js')
+const { WS, filterInactiveClients, websocketClients, sendToAll } = require('../ws')
+const gpio = require('../gpio')
+const { parseBoolean } = require('../utils')
+const { play, getTemp, monitorTemp } = require('../play_temperature')
+const MusicPlayer = require('../lib/music_player.js')
 
-const { downloadFromYoutube, updateSpotifySongs } = require('./lib/youtubify.js')
+const { downloadFromYoutube, updateSpotifySongs } = require('../lib/youtubify.js')
 
-const music_player = new MusicPlayer(path.join(__dirname, "res/music"));
-
+const music_player = new MusicPlayer(path.join(__dirname, "../res/music"));
 monitorTemp()
 setInterval(monitorTemp, 29 * 60 * 1000)
 
@@ -28,7 +27,7 @@ module.exports = () => {
   })
   api.get('/temperatureList', (req, res) => {
     const tempList = {};
-    tempList.temperatureList = JSON.parse(fs.readFileSync(path.join(__dirname, '../out/temp.json')));
+    tempList.temperatureList = JSON.parse(fs.readFileSync(path.join(__dirname, '../../out/temp.json')));
     res.json(tempList);
   })
   api.post('/smallCoffee', (req, res) => {
@@ -138,48 +137,6 @@ module.exports = () => {
         });
       })
   });
-  api.get('/musicPlayer/test', function(req, res) {
-    music_player._getFileInfo('trap/YI - mowilas.mp3');
-  });
-  api.get('/musicPlayer/test2', function(req, res) {
-    music_player._readMusicInfo()
-      .then((info) => {
-        console.log(info)
-        res.json(info)
-      })
-  });
-  api.post('/musicPlayer/play', function(req, res) {
-    music_player.play({
-      playlist: req.body.playlist,
-      songLike: req.body.songLike,
-      song: req.body.song
-    })
-    res.send('done')
-  })
-  api.post('/musicPlayer/pause', function(req, res) {
-    music_player.pause()
-    res.send('done')
-  })
-  api.post('/musicPlayer/resume', function(req, res) {
-    music_player.resume()
-    res.send('done')
-  })
-  api.post('/musicPlayer/stop', function(req, res) {
-    music_player.stop()
-    res.send('done')
-  })
-  api.post('/musicPlayer/prev', function(req, res) {
-    music_player.prev()
-    res.send('done')
-  })
-  api.post('/musicPlayer/next', function(req, res) {
-    music_player.next()
-    res.send('done')
-  })
-  api.post('/musicPlayer/setVolume', function(req, res) {
-    music_player.setVolume(req.body.volume)
-    res.send('done')
-  })
 
   api.get('/videoTest', function(req, res) {
     res.writeHead(200, { "Content-Type": "text/html" });
@@ -250,5 +207,6 @@ module.exports = () => {
     socket.sendJSON({ test: 'test' });
     websocketClients.push(socket);
   });
+  
   return api;
 };
