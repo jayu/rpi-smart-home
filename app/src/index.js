@@ -8,6 +8,8 @@ import Routes from './router';
 import './index.css'
 import './styles/font-awesome.min.css'
 require('es6-promise').polyfill();
+require("babel-core/register");
+require("babel-polyfill");
 
 ReactDOM.render(
   <Provider store={store}>{Routes}</Provider>,

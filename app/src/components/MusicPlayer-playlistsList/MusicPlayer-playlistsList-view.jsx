@@ -20,7 +20,6 @@ const PlaylistsListView = (props) => {
     <div className="PlaylistsListContainer">
       <ul className="PlaylistsList">
         {playlists}
-        {playlists}
       </ul>
     </div>
 	)

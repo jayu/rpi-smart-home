@@ -18,3 +18,4 @@ export const SET_TEMPERATURE_LIST = 'SET_TEMPERATURE_LIST'
 
 /* music player actions */
 
+export const SET_PLAYLISTS = 'SET_PLAYLISTS'

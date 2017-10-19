@@ -24,7 +24,12 @@ initialState.playlists = {
 	]
 }
 const musicPlayerReducer = (state = initialState, action) => {
+	console.log('musicPlayerReducer')
 	switch (action.type) {
+		case types.SET_PLAYLISTS: {
+			console.log('setting playlists')
+			return {...state, playlists : action.playlists}
+		}
 		default : {
 			return state
 		}
