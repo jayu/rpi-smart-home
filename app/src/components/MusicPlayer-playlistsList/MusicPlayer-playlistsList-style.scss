@@ -1,0 +1,26 @@
+
+.PlaylistsListContainer {
+	height : 65vh;
+	display: flex;
+	overflow-y: auto;
+	overflow-x: hidden;
+	.PlaylistsList {
+		padding: 0;
+		width: 100%;
+		.playlist {
+			border: 1px solid coral;
+			margin: 5px;
+			padding: 5px;
+			.playlistName {
+				font-size: 1.2rem;
+				font-weight:bold;
+			}
+			.songsList {
+				.songName {
+					line-height: 2rem;
+				}
+			}
+		}
+	}
+}
+	

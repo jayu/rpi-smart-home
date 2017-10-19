@@ -4,8 +4,7 @@ import MusicPlayerView from './MusicPlayer-view.jsx'
 import store from '../../store'
 import './MusicPlayer-style.scss'
 
-const mapStateToProps = state => ({
-})
+const mapStateToProps = state => (state.musicPlayerState)
 
 const mapDispatchToProps = (dispatch) => {
 	const dispatches = {

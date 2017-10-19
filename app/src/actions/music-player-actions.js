@@ -10,6 +10,17 @@ export const name2 = (index, value) => ({
 
 /* Async actions */
 
-export const name = (index) => (dispatch, getState) => {
-	
+export const playSong = (playlist, songName) => (dispatch, getState) => {
+	console.log(playlistName, songName)
+	const url = `http://${location.host}/api/musicPlayer/play`
+	axios.post(url, {
+		playlist,
+		songName,
+	})
+}
+export const playPlaylist = (playlist) => (dispatch, getState) => {
+	const url = `http://${location.host}/api/musicPlayer/play`
+	axios.post(url, {
+		playlist,
+	})
 }

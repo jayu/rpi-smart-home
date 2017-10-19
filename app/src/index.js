@@ -6,6 +6,7 @@ import App from './components/App/App-container'
 import store from './store'
 import Routes from './router';
 import './index.css'
+import './styles/font-awesome.min.css'
 require('es6-promise').polyfill();
 
 ReactDOM.render(
