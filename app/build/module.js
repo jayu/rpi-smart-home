@@ -41158,6 +41158,8 @@ var Example = Example || {}; Example["module"] =
 					dispatch((0, _setupActions.getInitialState)());
 				case 'SONG_NAME_CHANGED':
 					dispatch((0, _musicPlayerActions.setCurrentSong)(msg.name));
+				case 'SPOTIFY_SYNC_STATE':
+					dispatch((0, _musicPlayerActions.setSyncState)(msg.state));
 			}
 		};
 	};
@@ -41277,6 +41279,7 @@ var Example = Example || {}; Example["module"] =
 	var SET_VOLUME = exports.SET_VOLUME = 'SET_VOLUME';
 	var SET_SHUFFLE = exports.SET_SHUFFLE = 'SET_SHUFFLE';
 	var SET_REPEAT = exports.SET_REPEAT = 'SET_REPEAT';
+	var SET_SYNC_STATE = exports.SET_SYNC_STATE = 'SET_SYNC_STATE';
 
 /***/ },
 /* 646 */
@@ -41428,7 +41431,9 @@ var Example = Example || {}; Example["module"] =
 		volume: 50, // 0-100	
 		playbackState: "paused", //"playing, paused"
 		playStartTime: null,
-		songStartedAt: 0 };
+		songStartedAt: 0, //
+		spotifySyncState: "Done"
+	};
 	var musicPlayerReducer = function musicPlayerReducer() {
 		var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
 		var action = arguments[1];
@@ -41457,6 +41462,10 @@ var Example = Example || {}; Example["module"] =
 			case types.SET_REPEAT:
 				{
 					return _extends({}, state, { repeat: action.repeat });
+				}
+			case types.SET_SYNC_STATE:
+				{
+					return _extends({}, state, { spotifySyncState: action.state });
 				}
 			default:
 				{
@@ -41532,7 +41541,7 @@ var Example = Example || {}; Example["module"] =
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.changeVolume = exports.spotifySync = exports.toggleRepeat = exports.toggleShuffle = exports.prevSong = exports.nextSong = exports.resumePlayback = exports.pausePlayback = exports.playPlaylist = exports.playSong = exports.getPlayerSetup = exports.getMusicInfo = exports.setVolume = exports.setRepeat = exports.setShuffle = exports.setPlaybackState = exports.setCurrentSong = exports.setPlaylistsInfo = undefined;
+	exports.changeVolume = exports.spotifySync = exports.toggleRepeat = exports.toggleShuffle = exports.prevSong = exports.nextSong = exports.resumePlayback = exports.pausePlayback = exports.playPlaylist = exports.playSong = exports.getPlayerSetup = exports.getMusicInfo = exports.setSyncState = exports.setVolume = exports.setRepeat = exports.setShuffle = exports.setPlaybackState = exports.setCurrentSong = exports.setPlaylistsInfo = undefined;
 
 	var _axios = __webpack_require__(613);
 
@@ -41584,6 +41593,12 @@ var Example = Example || {}; Example["module"] =
 		return {
 			type: actionTypes.SET_VOLUME,
 			volume: volume
+		};
+	};
+	var setSyncState = exports.setSyncState = function setSyncState(state) {
+		return {
+			type: actionTypes.SET_SYNC_STATE,
+			state: state
 		};
 	};
 
@@ -77037,7 +77052,8 @@ var Example = Example || {}; Example["module"] =
 
 	var mapStateToProps = function mapStateToProps(state) {
 		return {
-			volume: state.musicPlayerState.volume
+			volume: state.musicPlayerState.volume,
+			spotifySyncState: state.musicPlayerState.spotifySyncState
 		};
 	};
 
@@ -77090,7 +77106,8 @@ var Example = Example || {}; Example["module"] =
 	    _react2.default.createElement(
 	      'p',
 	      null,
-	      'Spotify sync'
+	      'Spotify sync ',
+	      props.spotifySyncState
 	    ),
 	    _react2.default.createElement(
 	      'button',

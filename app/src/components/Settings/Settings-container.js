@@ -7,7 +7,8 @@ import './Settings-style.scss'
 import {changeVolume, spotifySync} from '../../actions/music-player-actions'
 
 const mapStateToProps = state => ({
-	volume : state.musicPlayerState.volume
+	volume : state.musicPlayerState.volume,
+	spotifySyncState : state.musicPlayerState.spotifySyncState
 })
 
 const mapDispatchToProps = (dispatch) => {

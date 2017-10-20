@@ -27,6 +27,10 @@ export const setVolume = (volume) => ({
 	type : actionTypes.SET_VOLUME,
 	volume
 })
+export const setSyncState = (state) => ({
+	type : actionTypes.SET_SYNC_STATE,
+	state
+})
 
 /* Async actions */
 export const getMusicInfo = () => async (dispatch, getState) => {

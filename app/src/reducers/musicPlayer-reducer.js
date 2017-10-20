@@ -10,6 +10,7 @@ const initialState = {
 	playbackState : "paused", //"playing, paused"
 	playStartTime : null,
 	songStartedAt : 0, //
+	spotifySyncState : "Done",
 }
 const musicPlayerReducer = (state = initialState, action) => {
 	switch (action.type) {
@@ -30,6 +31,9 @@ const musicPlayerReducer = (state = initialState, action) => {
 		}
 		case types.SET_REPEAT: {
 			return {...state, repeat : action.repeat}
+		}
+		case types.SET_SYNC_STATE: {
+			return {...state, spotifySyncState : action.state}
 		}
 		default : {
 			return state

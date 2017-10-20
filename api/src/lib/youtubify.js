@@ -14,6 +14,8 @@ const SpotifyWebApi = require('spotify-web-api-node');
 const { spawn, execFile } = require('child_process')
 const youTube = new(require('youtube-node'))()
 
+const {sendToAll} = require('../ws')
+
 const { 
 	deleteFolderRecursive, 
 	titleCoverage, 
@@ -149,6 +151,18 @@ const getPlaylistTracks = (spotifyApi) => (userId, playlistId) => {
     }, logError('Spotify API'));
 }
 
+const stateNotifier = () => {
+  let _total = 0;
+  let _done  = 0;
+  return (total = _total) => {
+    _total = total
+    _done++
+    sendToAll({
+      type : "SPOTIFY_SYNC_STATE",
+      state : `${_done}/${total}`
+    })
+  }
+}
 const updateSpotifySongs = (userId, ommitPlaylists, outDir) => {
   return authenticateSpotify()
     .then((spotifyApi) => {
@@ -199,6 +213,7 @@ const updateSpotifySongs = (userId, ommitPlaylists, outDir) => {
           })
       })
       .then((playlistsTracksToDownload) => {
+        const notifier = stateNotifier()
         const allDownloads = []
         Object.keys(playlistsTracksToDownload).forEach((playlistName) => {
           playlistsTracksToDownload[playlistName].forEach(({ desiredTitle, id }) => {
@@ -218,6 +233,7 @@ const updateSpotifySongs = (userId, ommitPlaylists, outDir) => {
                 return convertMp4toMp3(outputPath, targetFilePath, bitrate)
                   .then((convertedFile) => {
                     fs.unlinkSync(outputPath);
+                    notifier()
                     console.log("File", convertedFile, "downloaded and converted");
                     return convertedFile
                   })
@@ -225,6 +241,7 @@ const updateSpotifySongs = (userId, ommitPlaylists, outDir) => {
             )
           })
         })
+        notifier(allDownloads.length)
         return Promise.all(allDownloads)
           .then((allDownloads) => {
             Object.keys(playlistsTracksToDownload).forEach((playlistName) => {
