@@ -55,20 +55,7 @@ module.exports = () => {
     res.send('done')
   })
   musicPlayer.post('/spotifySync', function(req, res) {
-    const toOmmit = [
-      'Uro Martynki',
-      'Afternoon Train Ride',
-      'Emotron',
-      'deep Chill',
-      'kartka',
-      'Reading Soundtrack',
-      'car rollin',
-      'russ Hip-Hop',
-      'Holidays',
-      'Hip-Hop & R&B',
-      'Bedoes'
-    ]
-    updateSpotifySongs('11156868367', toOmmit, path.join(__dirname, '../res/music'))
+    music_player.spotifySync()
     res.send('done');
   })
   musicPlayer.get('/musicInfo', (req, res) => {

@@ -8,6 +8,8 @@ const mp3Length = require('mp3-length');
 
 const { WS, filterInactiveClients, websocketClients, sendToAll } = require('../ws')
 
+const { downloadFromYoutube, updateSpotifySongs } = require('./youtubify.js')
+
 
 /* 
 	
@@ -92,6 +94,30 @@ class MusicPlayer {
           musicInfo.playlists[playlists[i]] = music[i]
         }
         return musicInfo
+      })
+  }
+  spotifySync() {
+    const toOmmit = [
+      'Uro Martynki',
+      'Afternoon Train Ride',
+      'Emotron',
+      //'deep Chill',
+      'kartka',
+      'Reading Soundtrack',
+      'car rollin',
+      'russ Hip-Hop',
+      'Holidays',
+      'Hip-Hop & R&B',
+      'Bedoes'
+    ]
+    updateSpotifySongs('11156868367', toOmmit, path.join(__dirname, '../res/music'))
+      .then(allDownloads => {
+        console.log('spotifySync funnished', allDownloads.length)
+        this._readMusicInfo()
+          .then((musicInfo) => {
+            this.musicInfo = musicInfo
+            console.log('musicInfo', musicInfo)
+          })
       })
   }
   getMusicInfo() {

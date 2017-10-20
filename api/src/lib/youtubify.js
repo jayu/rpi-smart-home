@@ -102,12 +102,12 @@ const _convertMp4toMp3 = (inFilePath, outFilePath, bitrate) => {
 const downloadQueue = new TaskQueue((taskInfo) => {
   const { videoId, fileName, writable } = taskInfo;
   return _downloadFromYoutube(videoId, fileName, writable);
-});
+}, "downloadQueue");
 
 const convertQueue = new TaskQueue((taskInfo) => {
   const { inFilePath, outFilePath, bitrate } = taskInfo;
   return _convertMp4toMp3(inFilePath, outFilePath, bitrate);
-});
+}, "convertQueue");
 
 const downloadFromYoutube = (videoId, fileName, writable) => {
   return new Promise((resolve, reject) => {
@@ -150,7 +150,7 @@ const getPlaylistTracks = (spotifyApi) => (userId, playlistId) => {
 }
 
 const updateSpotifySongs = (userId, ommitPlaylists, outDir) => {
-  authenticateSpotify()
+  return authenticateSpotify()
     .then((spotifyApi) => {
         return getUserPlaylists(spotifyApi)(userId)
           .then((playlists) => {
@@ -235,8 +235,8 @@ const updateSpotifySongs = (userId, ommitPlaylists, outDir) => {
           })
       })
       .then((allDownloads) => {
+        return(allDownloads)
         console.log('Whole task finnished:', allDownloads);
-
       })
       .catch(logError('updateSpotifySongs'))
     })
