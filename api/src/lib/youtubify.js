@@ -90,8 +90,11 @@ const _downloadFromYoutube = (videoId, filePath, writable) => {
 }
 const _convertMp4toMp3 = (inFilePath, outFilePath, bitrate) => {
   return new Promise((resolve, reject) => {
+    console.log("converting", inFilePath, "started")
     const args = ['-i', inFilePath, '-vn', '-ab', bitrate ? `${bitrate}k` : '320k', '-y', outFilePath];
     const converter = spawn('avconv', args)
+    converter.stdout.pipe(process.stdout);
+    converter.stderr.pipe(process.stderr);
     converter.on('exit', () => {
       console.log('conversion success', inFilePath)
       resolve(outFilePath)
@@ -109,6 +112,7 @@ const downloadQueue = new TaskQueue((taskInfo) => {
 }, "downloadQueue");
 
 const convertQueue = new TaskQueue((taskInfo) => {
+  console.log("next task from convert queue", taskInfo)
   const { inFilePath, outFilePath, bitrate } = taskInfo;
   return _convertMp4toMp3(inFilePath, outFilePath, bitrate);
 }, "convertQueue");
@@ -232,6 +236,7 @@ const updateSpotifySongs = (userId, ommitPlaylists, outDir) => {
                 if (!fs.existsSync(targetDirectory)) {
                   fs.mkdirSync(targetDirectory);
                 }
+                console.log(desiredTitle, "downloaded")
                 return convertMp4toMp3(outputPath, targetFilePath, bitrate)
                   .then((convertedFile) => {
                     fs.unlinkSync(outputPath);
