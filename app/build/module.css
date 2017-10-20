@@ -6,7 +6,8 @@
   .CoffeeMachine button {
     padding: 15px;
     font-size: 1.2rem;
-    margin: 10px; }
+    margin: 10px;
+    width: 140px; }
 .checkbox-container {
   display: flex;
   justify-content: flex-start;
@@ -88,19 +89,27 @@ input[type="checkbox"]:checked ~ .checkbox .switch {
   height: 65vh;
   display: flex;
   overflow-y: auto;
-  overflow-x: hidden; }
+  overflow-x: hidden;
+  padding: 10px; }
   .PlaylistsListContainer .PlaylistsList {
     padding: 0;
-    width: 100%; }
+    width: 100%;
+    list-style-type: none; }
     .PlaylistsListContainer .PlaylistsList .playlist {
       border: 1px solid coral;
+      border-radius: 5px;
       margin: 5px;
       padding: 5px; }
       .PlaylistsListContainer .PlaylistsList .playlist .playlistName {
+        margin: 5px;
         font-size: 1.2rem;
-        font-weight: bold; }
-      .PlaylistsListContainer .PlaylistsList .playlist .songsList .songName {
-        line-height: 2rem; }
+        font-weight: bold;
+        text-align: center;
+        text-transform: uppercase; }
+      .PlaylistsListContainer .PlaylistsList .playlist .songsList {
+        list-style-type: none; }
+        .PlaylistsListContainer .PlaylistsList .playlist .songsList .songName {
+          line-height: 1.8rem; }
 .MusicPlayer {
   bottom: 0px;
   height: 85vh;
@@ -127,9 +136,17 @@ input[type="checkbox"]:checked ~ .checkbox .switch {
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        border: 1px solid black; }
+        border: 1px solid black;
+        transition: border-color 0.3s ease, transform 0.2s ease; }
         .MusicPlayer .bottomPanel .buttons button.selected {
           color: coral; }
+        .MusicPlayer .bottomPanel .buttons button:hover, .MusicPlayer .bottomPanel .buttons button:active {
+          border: 1px solid coral;
+          cursor: pointer; }
+          .MusicPlayer .bottomPanel .buttons button:hover i, .MusicPlayer .bottomPanel .buttons button:active i {
+            color: coral; }
+        .MusicPlayer .bottomPanel .buttons button i {
+          transition: color 0.3s ease; }
 .App {
   display: flex;
   flex-direction: column;
@@ -157,11 +174,39 @@ input[type="checkbox"]:checked ~ .checkbox .switch {
   justify-content: center;
   align-items: center; }
 
+.Settings {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center; }
+  .Settings button {
+    width: 60px; }
+    .Settings button i {
+      font-size: 1.6rem; }
 body {
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
-}
+  font-family: sans-serif; }
+
+button {
+  background-color: white;
+  height: 60px;
+  border: 2px solid coral;
+  border-radius: 30px;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+  color: black;
+  outline: none; }
+  @media (min-width: 1000px) {
+    button:hover {
+      background-color: coral;
+      color: white;
+      cursor: pointer; } }
+  button:active {
+    background-color: coral;
+    color: white;
+    cursor: pointer; }
+  button:active {
+    transform: scale(0.95); }
 /*!
  *  Font Awesome 4.7.0 by @davegandy - http://fontawesome.io - @fontawesome
  *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)

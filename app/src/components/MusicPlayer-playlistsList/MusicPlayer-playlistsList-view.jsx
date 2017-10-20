@@ -9,7 +9,7 @@ const PlaylistsListView = (props) => {
           <ol className="songsList">
             {props.playlists[playlistName].map((song) => {
               return (
-                <li className="songName" key={song.name} onClick={props.playSong(playlistName, song.name)}>{song.name}</li>
+                <li className="songName" key={song.name} onClick={props.playSong(playlistName, song.name)}>{song.name.substr(0,song.name.length-4)}</li>
               )
             })}
           </ol>

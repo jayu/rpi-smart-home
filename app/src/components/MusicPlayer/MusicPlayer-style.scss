@@ -31,6 +31,17 @@
 				&.selected {
 					color: coral;
 				}
+				transition: border-color 0.3s ease, transform 0.2s ease;
+				&:hover, &:active {
+					border: 1px solid coral;
+					cursor: pointer;
+					i {
+						color: coral;
+					}
+				}
+				i {
+					transition: color 0.3s ease;
+				}
 			}
 		}
 	}

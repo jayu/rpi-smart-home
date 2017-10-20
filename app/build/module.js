@@ -39299,7 +39299,7 @@ var Example = Example || {}; Example["module"] =
 
 	var _router2 = _interopRequireDefault(_router);
 
-	__webpack_require__(858);
+	__webpack_require__(869);
 
 	__webpack_require__(860);
 
@@ -41048,12 +41048,14 @@ var Example = Example || {}; Example["module"] =
 	    _react2.default.createElement(
 	      "button",
 	      { onClick: props.makeCoffee("small") },
-	      "Small Coffee"
+	      "Small ",
+	      _react2.default.createElement("i", { className: "fa fa-coffee", "aria-hidden": "true" })
 	    ),
 	    _react2.default.createElement(
 	      "button",
 	      { onClick: props.makeCoffee("big") },
-	      "Big Coffee"
+	      "Big ",
+	      _react2.default.createElement("i", { className: "fa fa-coffee", "aria-hidden": "true" })
 	    )
 	  );
 	};
@@ -76767,7 +76769,7 @@ var Example = Example || {}; Example["module"] =
 	          return _react2.default.createElement(
 	            "li",
 	            { className: "songName", key: song.name, onClick: props.playSong(playlistName, song.name) },
-	            song.name
+	            song.name.substr(0, song.name.length - 4)
 	          );
 	        })
 	      )
@@ -76989,12 +76991,7 @@ var Example = Example || {}; Example["module"] =
 
 /***/ },
 /* 857 */,
-/* 858 */
-/***/ function(module, exports) {
-
-	// removed by extract-text-webpack-plugin
-
-/***/ },
+/* 858 */,
 /* 859 */,
 /* 860 */
 /***/ function(module, exports) {
@@ -77121,6 +77118,13 @@ var Example = Example || {}; Example["module"] =
 
 /***/ },
 /* 867 */
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
+
+/***/ },
+/* 868 */,
+/* 869 */
 /***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
