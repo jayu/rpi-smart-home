@@ -120,9 +120,16 @@ input[type="checkbox"]:checked ~ .checkbox .switch {
       align-items: center;
       justify-content: center; }
       .MusicPlayer .bottomPanel .buttons button {
+        background-color: transparent;
         padding: 8px;
         font-size: 1.0rem;
-        margin: 10px; }
+        margin: 10px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid black; }
+        .MusicPlayer .bottomPanel .buttons button.selected {
+          color: coral; }
 .App {
   display: flex;
   flex-direction: column;
@@ -141,7 +148,7 @@ input[type="checkbox"]:checked ~ .checkbox .switch {
     width: auto;
     margin: 2px 5px;
     padding: 15px 15px;
-    min-width: 30px;
+    min-width: 25px;
     font-size: 1.2rem;
     text-align: center;
     color: white; }

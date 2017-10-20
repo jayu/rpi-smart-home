@@ -9,6 +9,7 @@ import CoffeeMachine        from './components/CoffeeMachine/CoffeeMachine-conta
 import Sockets              from './components/Sockets/Sockets-container';
 import Temperature          from './components/Temperature/Temperature-container';
 import MusicPlayer          from './components/MusicPlayer/MusicPlayer-container';
+import Settings          from './components/Settings/Settings-container';
 // Routes
 
 const Routes  = (
@@ -19,6 +20,7 @@ const Routes  = (
         <Route path="temperature" component={Temperature}/>
         <Route path="musicPlayer" component={MusicPlayer}/>
         <Route path="coffeeMachine" component={CoffeeMachine}/>
+        <Route path="settings" component={Settings}/>
     </Route>
   </Router>
 );

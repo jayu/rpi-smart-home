@@ -54,7 +54,7 @@ module.exports = () => {
     music_player.setRepeat(req.body.repeat)
     res.send('done')
   })
-  musicPlayer.get('/updateSpotify', function(req, res) {
+  musicPlayer.post('/spotifySync', function(req, res) {
     const toOmmit = [
       'Uro Martynki',
       'Afternoon Train Ride',
@@ -68,7 +68,7 @@ module.exports = () => {
       'Hip-Hop & R&B',
       'Bedoes'
     ]
-    updateSpotifySongs('11156868367', toOmmit, path.join(__dirname, 'res/music'))
+    updateSpotifySongs('11156868367', toOmmit, path.join(__dirname, '../res/music'))
     res.send('done');
   })
   musicPlayer.get('/musicInfo', (req, res) => {

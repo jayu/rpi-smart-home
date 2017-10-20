@@ -41532,7 +41532,7 @@ var Example = Example || {}; Example["module"] =
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.toggleRepeat = exports.toggleShuffle = exports.prevSong = exports.nextSong = exports.resumePlayback = exports.pausePlayback = exports.playPlaylist = exports.playSong = exports.getPlayerSetup = exports.getMusicInfo = exports.setVolume = exports.setRepeat = exports.setShuffle = exports.setPlaybackState = exports.setCurrentSong = exports.setPlaylistsInfo = undefined;
+	exports.changeVolume = exports.spotifySync = exports.toggleRepeat = exports.toggleShuffle = exports.prevSong = exports.nextSong = exports.resumePlayback = exports.pausePlayback = exports.playPlaylist = exports.playSong = exports.getPlayerSetup = exports.getMusicInfo = exports.setVolume = exports.setRepeat = exports.setShuffle = exports.setPlaybackState = exports.setCurrentSong = exports.setPlaylistsInfo = undefined;
 
 	var _axios = __webpack_require__(613);
 
@@ -41882,6 +41882,66 @@ var Example = Example || {}; Example["module"] =
 
 			return function (_x19, _x20) {
 				return _ref10.apply(this, arguments);
+			};
+		}();
+	};
+
+	var spotifySync = exports.spotifySync = function spotifySync() {
+		return function () {
+			var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11(dispatch, getState) {
+				var url;
+				return regeneratorRuntime.wrap(function _callee11$(_context11) {
+					while (1) {
+						switch (_context11.prev = _context11.next) {
+							case 0:
+								console.log('Sync spotify');
+								url = 'http://' + location.host + '/api/musicPlayer/spotifySync';
+								_context11.next = 4;
+								return _axios2.default.post(url);
+
+							case 4:
+								alert('sync in progress');
+
+							case 5:
+							case 'end':
+								return _context11.stop();
+						}
+					}
+				}, _callee11, undefined);
+			}));
+
+			return function (_x21, _x22) {
+				return _ref11.apply(this, arguments);
+			};
+		}();
+	};
+	var changeVolume = exports.changeVolume = function changeVolume(volume) {
+		return function () {
+			var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12(dispatch, getState) {
+				var url;
+				return regeneratorRuntime.wrap(function _callee12$(_context12) {
+					while (1) {
+						switch (_context12.prev = _context12.next) {
+							case 0:
+								url = 'http://' + location.host + '/api/musicPlayer/setVolume';
+								_context12.next = 3;
+								return _axios2.default.post(url, {
+									volume: volume
+								});
+
+							case 3:
+								dispatch(setVolume(volume));
+
+							case 4:
+							case 'end':
+								return _context12.stop();
+						}
+					}
+				}, _callee12, undefined);
+			}));
+
+			return function (_x23, _x24) {
+				return _ref12.apply(this, arguments);
 			};
 		}();
 	};
@@ -76558,7 +76618,7 @@ var Example = Example || {}; Example["module"] =
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var MusicPlayerView = function MusicPlayerView(props) {
-	  var playPauseBtn = props.playbackState == 'playing' ? "pause" : "play";
+	  var playPauseBtn = props.playbackState == 'playing' ? _react2.default.createElement('i', { className: 'fa fa-pause', 'aria-hidden': 'true' }) : _react2.default.createElement('i', { className: 'fa fa-play', 'aria-hidden': 'true' });
 	  var playPauseBtnAction = props.playbackState == 'playing' ? props.pause : props.playbackState == "paused" ? props.resume : null;
 	  console.log(props.playbackState, playPauseBtnAction);
 	  return _react2.default.createElement(
@@ -76578,13 +76638,13 @@ var Example = Example || {}; Example["module"] =
 	        { className: 'buttons' },
 	        _react2.default.createElement(
 	          'button',
-	          { style: props.shuffle ? { backgroundColor: 'red' } : null, onClick: props.toggleShuffle(props.shuffle) },
-	          '\u2928'
+	          { className: props.shuffle ? "selected" : "", onClick: props.toggleShuffle(props.shuffle) },
+	          _react2.default.createElement('i', { className: 'fa fa-random', 'aria-hidden': 'true' })
 	        ),
 	        _react2.default.createElement(
 	          'button',
 	          { onClick: props.prev },
-	          '<'
+	          _react2.default.createElement('i', { className: 'fa fa-chevron-left', 'aria-hidden': 'true' })
 	        ),
 	        _react2.default.createElement(
 	          'button',
@@ -76594,12 +76654,12 @@ var Example = Example || {}; Example["module"] =
 	        _react2.default.createElement(
 	          'button',
 	          { onClick: props.next },
-	          '>'
+	          _react2.default.createElement('i', { className: 'fa fa-chevron-right', 'aria-hidden': 'true' })
 	        ),
 	        _react2.default.createElement(
 	          'button',
-	          { style: props.repeat ? { backgroundColor: 'red' } : null, onClick: props.toggleRepeat(props.repeat) },
-	          '\u21BB'
+	          { className: props.repeat ? "selected" : "", onClick: props.toggleRepeat(props.repeat) },
+	          _react2.default.createElement('i', { className: 'fa fa-repeat', 'aria-hidden': 'true' })
 	        )
 	      )
 	    )
@@ -76768,9 +76828,16 @@ var Example = Example || {}; Example["module"] =
 
 	var _MusicPlayerContainer2 = _interopRequireDefault(_MusicPlayerContainer);
 
+	var _SettingsContainer = __webpack_require__(865);
+
+	var _SettingsContainer2 = _interopRequireDefault(_SettingsContainer);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	// Routes
+
+	// Components
+
 
 	var Routes = _react2.default.createElement(
 	  _reactRouter.Router,
@@ -76782,12 +76849,10 @@ var Example = Example || {}; Example["module"] =
 	    _react2.default.createElement(_reactRouter.Route, { path: 'sockets', component: _SocketsContainer2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: 'temperature', component: _TemperatureContainer2.default }),
 	    _react2.default.createElement(_reactRouter.Route, { path: 'musicPlayer', component: _MusicPlayerContainer2.default }),
-	    _react2.default.createElement(_reactRouter.Route, { path: 'coffeeMachine', component: _CoffeeMachineContainer2.default })
+	    _react2.default.createElement(_reactRouter.Route, { path: 'coffeeMachine', component: _CoffeeMachineContainer2.default }),
+	    _react2.default.createElement(_reactRouter.Route, { path: 'settings', component: _SettingsContainer2.default })
 	  )
 	);
-
-	// Components
-
 
 	exports.default = Routes;
 
@@ -76864,6 +76929,15 @@ var Example = Example || {}; Example["module"] =
 	              { to: '/musicPlayer', activeClassName: 'active' },
 	              _react2.default.createElement('i', { className: 'fa fa-music', 'aria-hidden': 'true' })
 	            )
+	          ),
+	          _react2.default.createElement(
+	            'li',
+	            null,
+	            _react2.default.createElement(
+	              _reactRouter.Link,
+	              { to: '/settings', activeClassName: 'active' },
+	              _react2.default.createElement('i', { className: 'fa fa-cog', 'aria-hidden': 'true' })
+	            )
 	          )
 	        )
 	      )
@@ -76934,6 +77008,105 @@ var Example = Example || {}; Example["module"] =
 	exports.default = function () {};
 
 	module.exports = exports["default"];
+
+/***/ },
+/* 865 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _reactRedux = __webpack_require__(262);
+
+	var _SettingsView = __webpack_require__(866);
+
+	var _SettingsView2 = _interopRequireDefault(_SettingsView);
+
+	var _store = __webpack_require__(640);
+
+	var _store2 = _interopRequireDefault(_store);
+
+	__webpack_require__(867);
+
+	var _musicPlayerActions = __webpack_require__(651);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var mapStateToProps = function mapStateToProps(state) {
+		return {
+			volume: state.musicPlayerState.volume
+		};
+	};
+
+	var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+		var dispatches = {
+			setVolume: function setVolume(event) {
+				//TODO throthlle
+				console.log(event.target.value);
+				dispatch((0, _musicPlayerActions.changeVolume)(event.target.value));
+			},
+			spotifySync: function spotifySync() {
+				dispatch((0, _musicPlayerActions.spotifySync)());
+			}
+		};
+		return dispatches;
+	};
+
+	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_SettingsView2.default);
+
+/***/ },
+/* 866 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _MusicPlayerPlaylistsListContainer = __webpack_require__(842);
+
+	var _MusicPlayerPlaylistsListContainer2 = _interopRequireDefault(_MusicPlayerPlaylistsListContainer);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var MusicPlayerView = function MusicPlayerView(props) {
+	  return _react2.default.createElement(
+	    'div',
+	    { className: 'Settings' },
+	    _react2.default.createElement(
+	      'p',
+	      null,
+	      'Speaker Volume'
+	    ),
+	    _react2.default.createElement('input', { type: 'range', min: '0', max: '100', value: props.volume, onChange: props.setVolume }),
+	    _react2.default.createElement(
+	      'p',
+	      null,
+	      'Spotify sync'
+	    ),
+	    _react2.default.createElement(
+	      'button',
+	      { onClick: props.spotifySync },
+	      _react2.default.createElement('i', { className: 'fa fa-refresh', 'aria-hidden': 'true' })
+	    )
+	  );
+	};
+
+	exports.default = MusicPlayerView;
+
+/***/ },
+/* 867 */
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
 
 /***/ }
 /******/ ]);

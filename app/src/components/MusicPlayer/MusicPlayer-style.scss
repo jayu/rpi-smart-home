@@ -20,9 +20,17 @@
 			align-items: center;
 			justify-content: center;
 			button {
+				background-color: transparent;
 				padding: 8px;
 				font-size: 1.0rem;
 				margin: 10px;
+				width: 40px;
+				height: 40px;
+				border-radius: 50%;
+				border: 1px solid black;
+				&.selected {
+					color: coral;
+				}
 			}
 		}
 	}

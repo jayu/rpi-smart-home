@@ -97,5 +97,18 @@ export const toggleRepeat = (repeat) => async (dispatch, getState) => {
 		repeat
 	})
 	dispatch(setRepeat(repeat))
-		
+}
+
+export const spotifySync = () => async (dispatch, getState) => {
+	console.log('Sync spotify')
+	const url = `http://${location.host}/api/musicPlayer/spotifySync`
+	await axios.post(url)
+	alert('sync in progress')
+}
+export const changeVolume = (volume) => async (dispatch, getState) => {
+	const url = `http://${location.host}/api/musicPlayer/setVolume`
+	await axios.post(url, {
+		volume
+	})
+	dispatch(setVolume(volume))
 }

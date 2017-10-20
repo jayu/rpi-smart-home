@@ -14,6 +14,7 @@ const MainLayout = (props) => {
             <li><Link to="/temperature" activeClassName="active" ><i className="fa fa-thermometer-full" aria-hidden="true"></i></Link></li>
             <li><Link to="/coffeeMachine" activeClassName="active" ><i className="fa fa-coffee" aria-hidden="true"></i></Link></li>
             <li><Link to="/musicPlayer" activeClassName="active" ><i className="fa fa-music" aria-hidden="true"></i></Link></li>
+            <li><Link to="/settings" activeClassName="active" ><i className="fa fa-cog" aria-hidden="true"></i></Link></li>
           </ul>
         </nav>
       </header>
