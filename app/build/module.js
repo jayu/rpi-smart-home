@@ -39299,14 +39299,14 @@ var Example = Example || {}; Example["module"] =
 
 	var _router2 = _interopRequireDefault(_router);
 
-	__webpack_require__(869);
+	__webpack_require__(862);
 
-	__webpack_require__(860);
+	__webpack_require__(864);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	__webpack_require__(280).polyfill();
-	__webpack_require__(863);
+	__webpack_require__(867);
 	__webpack_require__(282);
 
 	_reactDom2.default.render(_react2.default.createElement(
@@ -39399,6 +39399,10 @@ var Example = Example || {}; Example["module"] =
 
 	var _TemperatureContainer2 = _interopRequireDefault(_TemperatureContainer);
 
+	var _MusicPlayerContainer = __webpack_require__(840);
+
+	var _MusicPlayerContainer2 = _interopRequireDefault(_MusicPlayerContainer);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var AppView = function AppView(props) {
@@ -39412,7 +39416,8 @@ var Example = Example || {}; Example["module"] =
 	    ),
 	    _react2.default.createElement(_SocketsContainer2.default, null),
 	    _react2.default.createElement(_CoffeeMachineContainer2.default, null),
-	    _react2.default.createElement(_TemperatureContainer2.default, null)
+	    _react2.default.createElement(_TemperatureContainer2.default, null),
+	    _react2.default.createElement(_MusicPlayerContainer2.default, null)
 	  );
 	};
 
@@ -41077,13 +41082,15 @@ var Example = Example || {}; Example["module"] =
 
 	var _websocket2 = _interopRequireDefault(_websocket);
 
-	var _combineReducers = __webpack_require__(646);
+	var _combineReducers = __webpack_require__(647);
 
 	var _combineReducers2 = _interopRequireDefault(_combineReducers);
 
 	var _setupActions = __webpack_require__(643);
 
-	var _temperatureActions = __webpack_require__(650);
+	var _temperatureActions = __webpack_require__(651);
+
+	var _musicPlayerActions = __webpack_require__(646);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -41092,6 +41099,8 @@ var Example = Example || {}; Example["module"] =
 	(0, _websocket2.default)(store);
 	store.dispatch((0, _setupActions.getInitialState)());
 	store.dispatch((0, _temperatureActions.getTemperatureList)());
+	store.dispatch((0, _musicPlayerActions.getMusicInfo)());
+	store.dispatch((0, _musicPlayerActions.getPlayerSetup)());
 
 	exports.default = store;
 
@@ -41116,7 +41125,6 @@ var Example = Example || {}; Example["module"] =
 	  socket.onmessage = function (msg) {
 	    console.log(msg);
 	    msg = JSON.parse(msg.data);
-	    console.log(store.dispatch);
 	    store.dispatch(webSocketActions.socketReceive(msg));
 	  };
 	};
@@ -41142,12 +41150,18 @@ var Example = Example || {}; Example["module"] =
 
 	var _setupActions = __webpack_require__(643);
 
+	var _musicPlayerActions = __webpack_require__(646);
+
 	var socketReceive = exports.socketReceive = function socketReceive(msg) {
 		return function (dispatch, getState) {
-			console.log(msg);
+			console.log('ws msg', msg);
 			switch (msg.type) {
 				case 'STATE_CHANGED':
 					dispatch((0, _setupActions.getInitialState)());
+				case 'SONG_NAME_CHANGED':
+					dispatch((0, _musicPlayerActions.setCurrentSong)(msg.name));
+				case 'SPOTIFY_SYNC_STATE':
+					dispatch((0, _musicPlayerActions.setSyncState)(msg.state));
 			}
 		};
 	};
@@ -41175,7 +41189,7 @@ var Example = Example || {}; Example["module"] =
 		return function (dispatch, getState) {
 
 			var url = 'http://' + location.host + '/api/setup'; // TODO export hostname etc.
-			console.log('getting initial state');
+
 			_axios2.default.get(url).then(function (response) {
 				var pins = response.data.pins;
 				Object.keys(pins).forEach(function (key) {
@@ -41271,181 +41285,6 @@ var Example = Example || {}; Example["module"] =
 
 /***/ },
 /* 646 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _redux = __webpack_require__(241);
-
-	var _socketsReducer = __webpack_require__(647);
-
-	var _socketsReducer2 = _interopRequireDefault(_socketsReducer);
-
-	var _temperatureReducer = __webpack_require__(648);
-
-	var _temperatureReducer2 = _interopRequireDefault(_temperatureReducer);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var reducers = (0, _redux.combineReducers)({
-		socketsState: _socketsReducer2.default,
-		temperatureState: _temperatureReducer2.default
-	});
-	exports.default = reducers;
-
-/***/ },
-/* 647 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-	var _actionTypes = __webpack_require__(645);
-
-	var types = _interopRequireWildcard(_actionTypes);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-	var initialState = {
-		sockets: [false, false, false, false]
-	};
-
-	var socketsReducer = function socketsReducer() {
-		var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-		var action = arguments[1];
-
-		switch (action.type) {
-			case types.CHANGE_SOCKET_STATE:
-				{
-					var newSockets = [].concat(_toConsumableArray(state.sockets));
-					newSockets[action.index] = action.value;
-					return _extends({}, state, { sockets: newSockets });
-				}
-			default:
-				{
-					return state;
-				}
-		}
-	};
-
-	exports.default = socketsReducer;
-
-/***/ },
-/* 648 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-	var _actionTypes = __webpack_require__(645);
-
-	var types = _interopRequireWildcard(_actionTypes);
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-	var initialState = {
-		temperature: "",
-		temperatureList: {}
-	};
-	var temperatureReducer = function temperatureReducer() {
-		var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
-		var action = arguments[1];
-
-		switch (action.type) {
-			case types.CHANGE_TEMPERATURE:
-				{
-					state.temperature = action.temperature;
-					return _extends({}, state);
-				}
-			case types.SET_TEMPERATURE_LIST:
-				{
-					state.temperatureList = action.temperatureList;
-					return _extends({}, state);
-				}
-			default:
-				{
-					return state;
-				}
-		}
-	};
-
-	exports.default = temperatureReducer;
-
-/***/ },
-/* 649 */,
-/* 650 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	exports.getTemperatureList = exports.playTemperature = exports.setTemperatureList = exports.setTemperature = undefined;
-
-	var _actionTypes = __webpack_require__(645);
-
-	var actionTypes = _interopRequireWildcard(_actionTypes);
-
-	var _axios = __webpack_require__(613);
-
-	var _axios2 = _interopRequireDefault(_axios);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-	var setTemperature = exports.setTemperature = function setTemperature(temperature) {
-		return {
-			type: actionTypes.CHANGE_TEMPERATURE,
-			temperature: temperature
-		};
-	};
-	var setTemperatureList = exports.setTemperatureList = function setTemperatureList(temperatureList) {
-		return {
-			type: actionTypes.SET_TEMPERATURE_LIST,
-			temperatureList: temperatureList
-		};
-	};
-	var playTemperature = exports.playTemperature = function playTemperature() {
-		return function (dispatch, getState) {
-
-			var url = 'http://' + location.host + '/api/temperature'; // TODO export hostname etc.
-			console.log(url);
-			_axios2.default.post(url).then(function (response) {
-				dispatch(setTemperature(response.data.temperature));
-			});
-		};
-	};
-	var getTemperatureList = exports.getTemperatureList = function getTemperatureList() {
-		return function (dispatch, getState) {
-			var url = 'http://' + location.host + '/api/temperatureList'; // TODO export hostname etc.
-			console.log(url);
-			_axios2.default.get(url).then(function (response) {
-				console.log(setTemperatureList(response.data.temperatureList));
-				dispatch(setTemperatureList(response.data.temperatureList));
-			});
-		};
-	};
-
-/***/ },
-/* 651 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -41874,6 +41713,257 @@ var Example = Example || {}; Example["module"] =
 	};
 
 /***/ },
+/* 647 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _redux = __webpack_require__(241);
+
+	var _socketsReducer = __webpack_require__(648);
+
+	var _socketsReducer2 = _interopRequireDefault(_socketsReducer);
+
+	var _temperatureReducer = __webpack_require__(649);
+
+	var _temperatureReducer2 = _interopRequireDefault(_temperatureReducer);
+
+	var _musicPlayerReducer = __webpack_require__(650);
+
+	var _musicPlayerReducer2 = _interopRequireDefault(_musicPlayerReducer);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var reducers = (0, _redux.combineReducers)({
+		socketsState: _socketsReducer2.default,
+		temperatureState: _temperatureReducer2.default,
+		musicPlayerState: _musicPlayerReducer2.default
+	});
+	exports.default = reducers;
+
+/***/ },
+/* 648 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _actionTypes = __webpack_require__(645);
+
+	var types = _interopRequireWildcard(_actionTypes);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+	var initialState = {
+		sockets: [false, false, false, false]
+	};
+
+	var socketsReducer = function socketsReducer() {
+		var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+		var action = arguments[1];
+
+		switch (action.type) {
+			case types.CHANGE_SOCKET_STATE:
+				{
+					var newSockets = [].concat(_toConsumableArray(state.sockets));
+					newSockets[action.index] = action.value;
+					return _extends({}, state, { sockets: newSockets });
+				}
+			default:
+				{
+					return state;
+				}
+		}
+	};
+
+	exports.default = socketsReducer;
+
+/***/ },
+/* 649 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _actionTypes = __webpack_require__(645);
+
+	var types = _interopRequireWildcard(_actionTypes);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	var initialState = {
+		temperature: "",
+		temperatureList: {}
+	};
+	var temperatureReducer = function temperatureReducer() {
+		var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+		var action = arguments[1];
+
+		switch (action.type) {
+			case types.CHANGE_TEMPERATURE:
+				{
+					state.temperature = action.temperature;
+					return _extends({}, state);
+				}
+			case types.SET_TEMPERATURE_LIST:
+				{
+					state.temperatureList = action.temperatureList;
+					return _extends({}, state);
+				}
+			default:
+				{
+					return state;
+				}
+		}
+	};
+
+	exports.default = temperatureReducer;
+
+/***/ },
+/* 650 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _actionTypes = __webpack_require__(645);
+
+	var types = _interopRequireWildcard(_actionTypes);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	var initialState = {
+		currentSongTitle: "",
+		currentPlaylist: "",
+		playlists: [],
+		shuffle: false,
+		random: false,
+		volume: 50, // 0-100	
+		playbackState: "paused", //"playing, paused"
+		playStartTime: null,
+		songStartedAt: 0, //
+		spotifySyncState: "Done"
+	};
+	var musicPlayerReducer = function musicPlayerReducer() {
+		var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+		var action = arguments[1];
+
+		switch (action.type) {
+			case types.SET_PLAYLISTS:
+				{
+					return _extends({}, state, { playlists: action.playlists });
+				}
+			case types.SET_CURRENT_SONG:
+				{
+					return _extends({}, state, { currentSongTitle: action.songName });
+				}
+			case types.SET_PLAYBACK_STATE:
+				{
+					return _extends({}, state, { playbackState: action.state });
+				}
+			case types.SET_VOLUME:
+				{
+					return _extends({}, state, { volume: action.volume });
+				}
+			case types.SET_SHUFFLE:
+				{
+					return _extends({}, state, { shuffle: action.shuffle });
+				}
+			case types.SET_REPEAT:
+				{
+					return _extends({}, state, { repeat: action.repeat });
+				}
+			case types.SET_SYNC_STATE:
+				{
+					return _extends({}, state, { spotifySyncState: action.state });
+				}
+			default:
+				{
+					return state;
+				}
+		}
+	};
+
+	exports.default = musicPlayerReducer;
+
+/***/ },
+/* 651 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.getTemperatureList = exports.playTemperature = exports.setTemperatureList = exports.setTemperature = undefined;
+
+	var _actionTypes = __webpack_require__(645);
+
+	var actionTypes = _interopRequireWildcard(_actionTypes);
+
+	var _axios = __webpack_require__(613);
+
+	var _axios2 = _interopRequireDefault(_axios);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	var setTemperature = exports.setTemperature = function setTemperature(temperature) {
+		return {
+			type: actionTypes.CHANGE_TEMPERATURE,
+			temperature: temperature
+		};
+	};
+	var setTemperatureList = exports.setTemperatureList = function setTemperatureList(temperatureList) {
+		return {
+			type: actionTypes.SET_TEMPERATURE_LIST,
+			temperatureList: temperatureList
+		};
+	};
+	var playTemperature = exports.playTemperature = function playTemperature() {
+		return function (dispatch, getState) {
+
+			var url = 'http://' + location.host + '/api/temperature'; // TODO export hostname etc.
+			console.log(url);
+			_axios2.default.post(url).then(function (response) {
+				dispatch(setTemperature(response.data.temperature));
+			});
+		};
+	};
+	var getTemperatureList = exports.getTemperatureList = function getTemperatureList() {
+		return function (dispatch, getState) {
+			var url = 'http://' + location.host + '/api/temperatureList'; // TODO export hostname etc.
+			console.log(url);
+			_axios2.default.get(url).then(function (response) {
+				console.log(setTemperatureList(response.data.temperatureList));
+				dispatch(setTemperatureList(response.data.temperatureList));
+			});
+		};
+	};
+
+/***/ },
 /* 652 */
 /***/ function(module, exports) {
 
@@ -42032,7 +42122,7 @@ var Example = Example || {}; Example["module"] =
 
 	var _reactRedux = __webpack_require__(262);
 
-	var _temperatureActions = __webpack_require__(650);
+	var _temperatureActions = __webpack_require__(651);
 
 	var _TemperatureView = __webpack_require__(664);
 
@@ -76476,7 +76566,7 @@ var Example = Example || {}; Example["module"] =
 
 	var _reactRedux = __webpack_require__(262);
 
-	var _musicPlayerActions = __webpack_require__(651);
+	var _musicPlayerActions = __webpack_require__(646);
 
 	var _MusicPlayerView = __webpack_require__(841);
 
@@ -76607,7 +76697,7 @@ var Example = Example || {}; Example["module"] =
 
 	var _reactRedux = __webpack_require__(262);
 
-	var _musicPlayerActions = __webpack_require__(651);
+	var _musicPlayerActions = __webpack_require__(646);
 
 	var _MusicPlayerPlaylistsListView = __webpack_require__(843);
 
@@ -76755,7 +76845,7 @@ var Example = Example || {}; Example["module"] =
 
 	var _MusicPlayerContainer2 = _interopRequireDefault(_MusicPlayerContainer);
 
-	var _SettingsContainer = __webpack_require__(865);
+	var _SettingsContainer = __webpack_require__(858);
 
 	var _SettingsContainer2 = _interopRequireDefault(_SettingsContainer);
 
@@ -76901,38 +76991,7 @@ var Example = Example || {}; Example["module"] =
 
 /***/ },
 /* 857 */,
-/* 858 */,
-/* 859 */,
-/* 860 */
-/***/ function(module, exports) {
-
-	// removed by extract-text-webpack-plugin
-
-/***/ },
-/* 861 */,
-/* 862 */,
-/* 863 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* eslint max-len: 0 */
-	// TODO: eventually deprecate this console.trace("use the `babel-register` package instead of `babel-core/register`");
-	module.exports = __webpack_require__(864);
-
-
-/***/ },
-/* 864 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	exports.__esModule = true;
-
-	exports.default = function () {};
-
-	module.exports = exports["default"];
-
-/***/ },
-/* 865 */
+/* 858 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -76943,7 +77002,7 @@ var Example = Example || {}; Example["module"] =
 
 	var _reactRedux = __webpack_require__(262);
 
-	var _SettingsView = __webpack_require__(866);
+	var _SettingsView = __webpack_require__(859);
 
 	var _SettingsView2 = _interopRequireDefault(_SettingsView);
 
@@ -76951,9 +77010,9 @@ var Example = Example || {}; Example["module"] =
 
 	var _store2 = _interopRequireDefault(_store);
 
-	__webpack_require__(867);
+	__webpack_require__(860);
 
-	var _musicPlayerActions = __webpack_require__(651);
+	var _musicPlayerActions = __webpack_require__(646);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -76981,7 +77040,7 @@ var Example = Example || {}; Example["module"] =
 	exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_SettingsView2.default);
 
 /***/ },
-/* 866 */
+/* 859 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -77027,17 +77086,47 @@ var Example = Example || {}; Example["module"] =
 	exports.default = MusicPlayerView;
 
 /***/ },
-/* 867 */
+/* 860 */
 /***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
 
 /***/ },
-/* 868 */,
-/* 869 */
+/* 861 */,
+/* 862 */
 /***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
+
+/***/ },
+/* 863 */,
+/* 864 */
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
+
+/***/ },
+/* 865 */,
+/* 866 */,
+/* 867 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* eslint max-len: 0 */
+	// TODO: eventually deprecate this console.trace("use the `babel-register` package instead of `babel-core/register`");
+	module.exports = __webpack_require__(868);
+
+
+/***/ },
+/* 868 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	exports.__esModule = true;
+
+	exports.default = function () {};
+
+	module.exports = exports["default"];
 
 /***/ }
 /******/ ]);

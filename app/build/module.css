@@ -85,33 +85,6 @@ input[type="checkbox"]:checked ~ .checkbox .switch {
     padding: 15px;
     font-size: 1.2rem;
     margin: 10px; }
-.App {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center; }
-.main-nav ul {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  list-style-type: none;
-  padding: 0px; }
-  .main-nav ul li a {
-    background-color: coral;
-    border-radius: 5px;
-    display: block;
-    width: auto;
-    margin: 2px 5px;
-    padding: 15px 15px;
-    min-width: 25px;
-    font-size: 1.2rem;
-    text-align: center;
-    color: white; }
-.app .main {
-  display: flex;
-  justify-content: center;
-  align-items: center; }
-
 .PlaylistsListContainer {
   height: 65vh;
   display: flex;
@@ -174,6 +147,33 @@ input[type="checkbox"]:checked ~ .checkbox .switch {
             color: coral; }
         .MusicPlayer .bottomPanel .buttons button i {
           transition: color 0.3s ease; }
+.App {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center; }
+.main-nav ul {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  list-style-type: none;
+  padding: 0px; }
+  .main-nav ul li a {
+    background-color: coral;
+    border-radius: 5px;
+    display: block;
+    width: auto;
+    margin: 2px 5px;
+    padding: 15px 15px;
+    min-width: 25px;
+    font-size: 1.2rem;
+    text-align: center;
+    color: white; }
+.app .main {
+  display: flex;
+  justify-content: center;
+  align-items: center; }
+
 .Settings {
   display: flex;
   flex-direction: column;
