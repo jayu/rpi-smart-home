@@ -79,7 +79,7 @@ export const nextSong = () => async (dispatch, getState) => {
 }
 
 export const prevSong = () => async (dispatch, getState) => {
-	const url = `http://${location.host}/api/musicPlayer/next`
+	const url = `http://${location.host}/api/musicPlayer/prev`
 	await axios.post(url)
 }
 

@@ -41806,7 +41806,7 @@ var Example = Example || {}; Example["module"] =
 					while (1) {
 						switch (_context8.prev = _context8.next) {
 							case 0:
-								url = 'http://' + location.host + '/api/musicPlayer/next';
+								url = 'http://' + location.host + '/api/musicPlayer/prev';
 								_context8.next = 3;
 								return _axios2.default.post(url);
 
