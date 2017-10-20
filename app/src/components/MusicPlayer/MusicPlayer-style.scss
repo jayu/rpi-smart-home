@@ -11,6 +11,9 @@
 	}
 	.bottomPanel {
 		height: 19vh;
+		.songName {
+			text-align: center;
+		}
 		.buttons {
 			display: flex;
 			flex-direction: row;

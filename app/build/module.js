@@ -41532,7 +41532,7 @@ var Example = Example || {}; Example["module"] =
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.resumePlayback = exports.pausePlayback = exports.playPlaylist = exports.playSong = exports.getPlayerSetup = exports.getMusicInfo = exports.setVolume = exports.setRepeat = exports.setShuffle = exports.setPlaybackState = exports.setCurrentSong = exports.setPlaylistsInfo = undefined;
+	exports.toggleRepeat = exports.toggleShuffle = exports.prevSong = exports.nextSong = exports.resumePlayback = exports.pausePlayback = exports.playPlaylist = exports.playSong = exports.getPlayerSetup = exports.getMusicInfo = exports.setVolume = exports.setRepeat = exports.setShuffle = exports.setPlaybackState = exports.setCurrentSong = exports.setPlaylistsInfo = undefined;
 
 	var _axios = __webpack_require__(613);
 
@@ -41768,6 +41768,120 @@ var Example = Example || {}; Example["module"] =
 
 			return function (_x11, _x12) {
 				return _ref6.apply(this, arguments);
+			};
+		}();
+	};
+
+	var nextSong = exports.nextSong = function nextSong() {
+		return function () {
+			var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(dispatch, getState) {
+				var url;
+				return regeneratorRuntime.wrap(function _callee7$(_context7) {
+					while (1) {
+						switch (_context7.prev = _context7.next) {
+							case 0:
+								url = 'http://' + location.host + '/api/musicPlayer/next';
+								_context7.next = 3;
+								return _axios2.default.post(url);
+
+							case 3:
+							case 'end':
+								return _context7.stop();
+						}
+					}
+				}, _callee7, undefined);
+			}));
+
+			return function (_x13, _x14) {
+				return _ref7.apply(this, arguments);
+			};
+		}();
+	};
+
+	var prevSong = exports.prevSong = function prevSong() {
+		return function () {
+			var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(dispatch, getState) {
+				var url;
+				return regeneratorRuntime.wrap(function _callee8$(_context8) {
+					while (1) {
+						switch (_context8.prev = _context8.next) {
+							case 0:
+								url = 'http://' + location.host + '/api/musicPlayer/next';
+								_context8.next = 3;
+								return _axios2.default.post(url);
+
+							case 3:
+							case 'end':
+								return _context8.stop();
+						}
+					}
+				}, _callee8, undefined);
+			}));
+
+			return function (_x15, _x16) {
+				return _ref8.apply(this, arguments);
+			};
+		}();
+	};
+
+	var toggleShuffle = exports.toggleShuffle = function toggleShuffle(shuffle) {
+		return function () {
+			var _ref9 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(dispatch, getState) {
+				var url;
+				return regeneratorRuntime.wrap(function _callee9$(_context9) {
+					while (1) {
+						switch (_context9.prev = _context9.next) {
+							case 0:
+								url = 'http://' + location.host + '/api/musicPlayer/setShuffle';
+								_context9.next = 3;
+								return _axios2.default.post(url, {
+									shuffle: shuffle
+								});
+
+							case 3:
+								dispatch(setShuffle(shuffle));
+
+							case 4:
+							case 'end':
+								return _context9.stop();
+						}
+					}
+				}, _callee9, undefined);
+			}));
+
+			return function (_x17, _x18) {
+				return _ref9.apply(this, arguments);
+			};
+		}();
+	};
+	var toggleRepeat = exports.toggleRepeat = function toggleRepeat(repeat) {
+		return function () {
+			var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(dispatch, getState) {
+				var url;
+				return regeneratorRuntime.wrap(function _callee10$(_context10) {
+					while (1) {
+						switch (_context10.prev = _context10.next) {
+							case 0:
+								console.log(repeat);
+								url = 'http://' + location.host + '/api/musicPlayer/setRepeat';
+								_context10.next = 4;
+								return _axios2.default.post(url, {
+									repeat: repeat
+								});
+
+							case 4:
+								dispatch(setRepeat(repeat));
+
+							case 5:
+							case 'end':
+								return _context10.stop();
+						}
+					}
+				}, _callee10, undefined);
+			}));
+
+			return function (_x19, _x20) {
+				return _ref10.apply(this, arguments);
 			};
 		}();
 	};
@@ -76400,6 +76514,22 @@ var Example = Example || {}; Example["module"] =
 			},
 			resume: function resume() {
 				dispatch((0, _musicPlayerActions.resumePlayback)());
+			},
+			prev: function prev() {
+				dispatch((0, _musicPlayerActions.prevSong)());
+			},
+			next: function next() {
+				dispatch((0, _musicPlayerActions.nextSong)());
+			},
+			toggleShuffle: function toggleShuffle(shuffle) {
+				return function () {
+					dispatch((0, _musicPlayerActions.toggleShuffle)(!shuffle));
+				};
+			},
+			toggleRepeat: function toggleRepeat(repeat) {
+				return function () {
+					dispatch((0, _musicPlayerActions.toggleRepeat)(!repeat));
+				};
 			}
 		};
 		return dispatches;
@@ -76440,7 +76570,7 @@ var Example = Example || {}; Example["module"] =
 	      { className: 'bottomPanel' },
 	      _react2.default.createElement(
 	        'p',
-	        null,
+	        { className: 'songName' },
 	        props.currentSongTitle
 	      ),
 	      _react2.default.createElement(
@@ -76448,12 +76578,12 @@ var Example = Example || {}; Example["module"] =
 	        { className: 'buttons' },
 	        _react2.default.createElement(
 	          'button',
-	          { style: props.shuffle ? { backgroundColor: 'red' } : null },
+	          { style: props.shuffle ? { backgroundColor: 'red' } : null, onClick: props.toggleShuffle(props.shuffle) },
 	          '\u2928'
 	        ),
 	        _react2.default.createElement(
 	          'button',
-	          null,
+	          { onClick: props.prev },
 	          '<'
 	        ),
 	        _react2.default.createElement(
@@ -76463,12 +76593,12 @@ var Example = Example || {}; Example["module"] =
 	        ),
 	        _react2.default.createElement(
 	          'button',
-	          null,
+	          { onClick: props.next },
 	          '>'
 	        ),
 	        _react2.default.createElement(
 	          'button',
-	          { style: props.repeat ? { backgroundColor: 'red' } : null },
+	          { style: props.repeat ? { backgroundColor: 'red' } : null, onClick: props.toggleRepeat(props.repeat) },
 	          '\u21BB'
 	        )
 	      )

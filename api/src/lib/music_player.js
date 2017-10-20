@@ -3,6 +3,7 @@ const path = require('path')
 const { spawn, exec } = require('child_process')
 const { SoundPlayer } = require('./sound_player.js')
 const { TaskQueue } = require('./utils.js')
+const { parseBoolean } = require('../utils.js')
 const mp3Length = require('mp3-length');
 
 const { WS, filterInactiveClients, websocketClients, sendToAll } = require('../ws')
@@ -196,28 +197,35 @@ class MusicPlayer {
     }
   }
   next() {
-    this._setNextSongIndex()
-    this.currentSound.replace(this.queue[this.currentQueueIndex].path)
-      .then(this._setCurrentSound.bind(this))
-      .then(this._playbackEnd.bind(this))
+    if (this.currentSound != null) {
+      this._setNextSongIndex()
+      this.currentSound.replace(this.queue[this.currentQueueIndex].path)
+        .then(this._setCurrentSound.bind(this))
+        .then(this._playbackEnd.bind(this))
+    }
   }
   prev() {
-  	this._setPrevSongIndex()
-    this.currentSound.replace(this.queue[this.currentQueueIndex].path)
-      .then(this._setCurrentSound.bind(this))
-      .then(this._playbackEnd.bind(this))
+    if (this.currentSound != null) {
+    	this._setPrevSongIndex()
+      this.currentSound.replace(this.queue[this.currentQueueIndex].path)
+        .then(this._setCurrentSound.bind(this))
+        .then(this._playbackEnd.bind(this))
+    }
   }
   setRepeat(repeat) {
-  	this.repeat = !!repeat
+  	this.repeat = parseBoolean(repeat)
   }
   setShuffle(shuffle) {
-  	this.shuffle = !!shuffle
+  	this.shuffle = parseBoolean(shuffle)
   }
   setVolume(volume) {
     return SoundPlayer.setVolume(volume)
   }
   getVolume() {
     return SoundPlayer.getVolume()
+  }
+  getCurrentSongName() {
+    return this.currentSound ? this.queue[this.currentQueueIndex].name : ""
   }
 }
 module.exports = MusicPlayer;

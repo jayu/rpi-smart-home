@@ -112,6 +112,8 @@ input[type="checkbox"]:checked ~ .checkbox .switch {
     overflow-x: hidden; }
   .MusicPlayer .bottomPanel {
     height: 19vh; }
+    .MusicPlayer .bottomPanel .songName {
+      text-align: center; }
     .MusicPlayer .bottomPanel .buttons {
       display: flex;
       flex-direction: row;

@@ -1,7 +1,15 @@
 const parseBoolean = (value) => {
 	switch (value) {
-		case 'true' : return true; break;
-		case 'false': return false; break;
+		case 'true' : 
+		case '1' :
+		case 1 :
+		case true :
+			return true; break;
+		case 'false': 
+		case '0': 
+		case 0: 
+		case false: 
+			return false; break;
 		default : return undefined; break; 
 	}
 }

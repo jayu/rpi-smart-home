@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import {pausePlayback, resumePlayback} from '../../actions/music-player-actions'
+import {pausePlayback, resumePlayback, toggleShuffle, toggleRepeat, prevSong, nextSong} from '../../actions/music-player-actions'
 
 import MusicPlayerView from './MusicPlayer-view.jsx'
 import store from '../../store'
@@ -14,7 +14,19 @@ const mapDispatchToProps = (dispatch) => {
 		},
 		resume : () => {
 			dispatch(resumePlayback())
-		}
+		},
+		prev : () => {
+			dispatch(prevSong())
+		},
+		next : () => {
+			dispatch(nextSong())
+		},
+		toggleShuffle : (shuffle) => () => {
+			dispatch(toggleShuffle(!shuffle))
+		},
+		toggleRepeat : (repeat) => () => {
+			dispatch(toggleRepeat(!repeat))
+		},
 	}
 	return dispatches
 }

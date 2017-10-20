@@ -9,13 +9,13 @@ const MusicPlayerView = (props) => {
     <div className="MusicPlayer">        
       <PlaylistsList/>
       <div className="bottomPanel">
-        <p>{props.currentSongTitle}</p>
+        <p className="songName">{props.currentSongTitle}</p>
         <div className="buttons">
-          <button style={props.shuffle ? {backgroundColor : 'red'} : null}>&#10536;</button>
-          <button>&lt;</button>
+          <button style={props.shuffle ? {backgroundColor : 'red'} : null} onClick={props.toggleShuffle(props.shuffle)}>&#10536;</button>
+          <button onClick={props.prev}>&lt;</button>
           <button onClick={playPauseBtnAction} disabled={playPauseBtnAction==null}>{playPauseBtn}</button>
-          <button>&gt;</button>
-          <button style={props.repeat ? {backgroundColor : 'red'} : null}>&#8635;</button>
+          <button onClick={props.next}>&gt;</button>
+          <button style={props.repeat ? {backgroundColor : 'red'} : null} onClick={props.toggleRepeat(props.repeat)}>&#8635;</button>
         </div>
       </div>
     </div>

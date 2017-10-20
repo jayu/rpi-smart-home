@@ -46,6 +46,14 @@ module.exports = () => {
     music_player.setVolume(req.body.volume)
     res.send('done')
   })
+  musicPlayer.post('/setShuffle', function(req, res) {
+    music_player.setShuffle(req.body.shuffle)
+    res.send('done')
+  })
+  musicPlayer.post('/setRepeat', function(req, res) {
+    music_player.setRepeat(req.body.repeat)
+    res.send('done')
+  })
   musicPlayer.get('/updateSpotify', function(req, res) {
     const toOmmit = [
       'Uro Martynki',
@@ -67,11 +75,12 @@ module.exports = () => {
     res.json(music_player.musicInfo)
   })
   musicPlayer.get('/setup', (req, res) => {
+    console.log(music_player)
     res.json({
       volume : music_player.getVolume(),
       shuffle : music_player.shuffle,
       repeat : music_player.repeat,
-      songName : music_player.currentSound != null ? this.queue[this.currentQueueIndex].name : "",
+      songName : music_player.getCurrentSongName(),
       playbackState : music_player.playbackState
     })
   })
