@@ -5,6 +5,8 @@ const { SoundPlayer } = require('./sound_player.js')
 const { TaskQueue } = require('./utils.js')
 const mp3Length = require('mp3-length');
 
+const { WS, filterInactiveClients, websocketClients, sendToAll } = require('../ws')
+
 
 /* 
 	
@@ -96,9 +98,10 @@ class MusicPlayer {
     this.queue = songs;
   }
   _setCurrentSound(currentSound) {
+    console.log('currentSound', currentSound)
+    sendToAll({ type: 'SONG_NAME_CHANGED', name : this.queue[this.currentQueueIndex].name });
     this.currentSound = currentSound;
     this.currentSoundStart = Date.now()
-    console.log('currentSound', currentSound)
     return currentSound.endPromise
   }
   _setNextSongIndex() {
@@ -132,7 +135,7 @@ class MusicPlayer {
   }
   _playQueue() { // recursive playing songs from playQueue
     this.currentSoundPausedAt = 0;
-    SoundPlayer.play(this.queue[this.currentQueueIndex])
+    SoundPlayer.play(this.queue[this.currentQueueIndex].path)
       .then(this._setCurrentSound.bind(this))
       .then(this._playbackEnd.bind(this))
   }
@@ -141,14 +144,15 @@ class MusicPlayer {
       //once the song finished, promise is resolved and next song is playing
       // here just create playQueue of songs and fire _playQueue
       this.stop()
-      const currentPlayList = [...this.musicInfo.playlists[args.playlist]]
+      let currentPlayList = [...this.musicInfo.playlists[args.playlist]]
       if (args.songName) {
         const i = currentPlayList.findIndex((song) => {
           return args.songName == song.name
         })
-        currentPlayList.unshift(currentPlayList.splice(i,1)[0]) // remove element and set at start
+        currentPlayList = currentPlayList.splice(i).concat(currentPlayList) // move songs from chosen song to last one at the begining
+        console.log(currentPlayList)
       }
-      this._setQueue(currentPlayList.map((song) => (song.path)))
+      this._setQueue(currentPlayList)
 
       if (args.songName == undefined && this.shuffle) {
         this.currentQueueIndex = ~~(this.queue.length * Math.random())
@@ -165,7 +169,7 @@ class MusicPlayer {
     this.stop()
   }
   resume() {
-    const song = [this.queue[this.currentQueueIndex], 'trim', ~~(this.currentSoundPausedAt/1000)]
+    const song = [this.queue[this.currentQueueIndex].path, 'trim', ~~(this.currentSoundPausedAt/1000)]
     SoundPlayer.play(song)
       .then(this._setCurrentSound.bind(this))
       .then(this._playbackEnd.bind(this))
@@ -178,13 +182,13 @@ class MusicPlayer {
   }
   next() {
     this._setNextSongIndex()
-    this.currentSound.replace(this.queue[this.currentQueueIndex])
+    this.currentSound.replace(this.queue[this.currentQueueIndex].path)
       .then(this._setCurrentSound.bind(this))
       .then(this._playbackEnd.bind(this))
   }
   prev() {
   	this._setPrevSongIndex()
-    this.currentSound.replace(this.queue[this.currentQueueIndex])
+    this.currentSound.replace(this.queue[this.currentQueueIndex].path)
       .then(this._setCurrentSound.bind(this))
       .then(this._playbackEnd.bind(this))
   }
