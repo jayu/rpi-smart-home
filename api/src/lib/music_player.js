@@ -197,7 +197,7 @@ class MusicPlayer {
     }
   }
   next() {
-    if (this.currentSound != null) {
+    if (this.currentSound != null && this.playbackState == playbackState.playing) {
       this._setNextSongIndex()
       this.currentSound.replace(this.queue[this.currentQueueIndex].path)
         .then(this._setCurrentSound.bind(this))
@@ -205,7 +205,7 @@ class MusicPlayer {
     }
   }
   prev() {
-    if (this.currentSound != null) {
+    if (this.currentSound != null && this.playbackState == playbackState.playing) {
     	this._setPrevSongIndex()
       this.currentSound.replace(this.queue[this.currentQueueIndex].path)
         .then(this._setCurrentSound.bind(this))
