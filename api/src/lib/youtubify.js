@@ -93,9 +93,11 @@ const _convertMp4toMp3 = (inFilePath, outFilePath, bitrate) => {
     const args = ['-i', inFilePath, '-vn', '-ab', bitrate ? `${bitrate}k` : '320k', '-y', outFilePath];
     const converter = spawn('avconv', args)
     converter.on('exit', () => {
+      console.log('conversion success', inFilePath)
       resolve(outFilePath)
     })
     converter.on('error', (err) => {
+      console.log('conversion error', inFilePath, err)
       resolve(err)
     })
   })
