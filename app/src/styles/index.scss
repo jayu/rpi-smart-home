@@ -20,6 +20,10 @@ button {
 			cursor: pointer;
 		}
 	}
+	&:focus {
+		box-shadow: none;
+		background-image: none;
+	}
 	&:active {
 		background-color: coral;
 		color: white;

@@ -201,6 +201,9 @@ button {
       background-color: coral;
       color: white;
       cursor: pointer; } }
+  button:focus {
+    box-shadow: none;
+    background-image: none; }
   button:active {
     background-color: coral;
     color: white;
