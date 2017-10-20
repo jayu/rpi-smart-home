@@ -3,79 +3,88 @@
 const fs = require('fs');
 
 const path = require('path');
-const { spawn, exec, execFile, fork } = require('child_process'); 
+const { spawn, exec, execFile, fork } = require('child_process');
+/* 
+	TODO play with trim time
 
+*/
 class SoundPlayer {
-	constructor() {
-		this.queue = []; // {command, resolve}
-		this.currentPlaying = false;
-	}
-	_addToQueue(command) { 
-		return new Promise((resolve, reject) => {
-			this.queue.push({command, resolve});
-			this._playNext();
-		})
-	}
-	_insertOnStart(command) {
-		return new Promise((resolve, reject) => {
-			//this.queue.push({command, resolve}); insert on start
-			this._playNext();
-		})
-	}
-	_playNext() {
-		if (!this.currentPlaying && this.queue.length > 0) {
-			this.currentPlaying = true;
+  constructor() {
+    this.queue = []; // {command, resolve}
+    this.currentPlaying = false;
+    this.volume = 50;
+    this.setVolume(this.volume)
+  }
+  _addToQueue(songs) {
+    return new Promise((resolve, reject) => {
+      this.queue.push({ songs, resolve });
+      this._playNext();
+    })
+  }
+  _insertOnStart(songs) {
+    return new Promise((resolve, reject) => {
+      this.queue.unshift({ songs, resolve }); //insert on start
+      console.log(this.queue)
+      this._playNext();
+    })
+  }
+  _playNext() {
+    if (!this.currentPlaying && this.queue.length > 0) {
+      this.currentPlaying = true;
+      let killed = false;
+      let resolveEnd = null;
+      const self = this;
+      const { songs, resolve } = this.queue.shift();
+      
+      const currentProcess = execFile('play', songs)
 
-			const self = this;
-			const {command, resolve} = this.queue.shift();
-			const currentProcess = exec(command);
-			
-			currentProcess.stdout.pipe(process.stdout);
-			currentProcess.stderr.pipe(process.stderr);
-			currentProcess.on('exit', (code, code2) => {
-				console.log('exit code', code, code2);
-				this.currentPlaying = false;
-				self._playNext()
-			})
+      currentProcess.stdout.pipe(process.stdout);
+      //currentProcess.stderr.pipe(process.stderr);
 
-			resolve({
-				kill : () => {
-					currentProcess.kill()
-				},
-				replace : (newSound) => {
-					currentProcess.kill(); 
-					return self._insertOnStart(newSound)
-				}
-			})
-			
-		}
+      const endPromise = new Promise((resolve, reject) => {
+        resolveEnd = resolve
+      });
 
-	}
-	_joinSounds(soundArr) {
-		let command = '';
-		for (let i = 0; i < soundArr.length-1; i++) {
-			command += `play ${soundArr[i]} && `;
-		}
-		command += `play ${soundArr[soundArr.length-1]}`
-		
-		return command;
-	}
-	_soundToCommand(sound) {
-		let command = '';
-		if (sound.constructor == Array) {
-			console.log('joining sounds');
-			command = this. _joinSounds(sound)
-		}
-		else {
-			command = `play ${sound}`
-		}
-		return command;
-	}
-	play(sound) {
-		return this._addToQueue(this._soundToCommand(sound))
-	}
+      currentProcess.on('exit', (code, code2) => {
+        this.currentPlaying = false;
+        self._playNext()
+        resolveEnd(!killed ? 'end' : 'killed');
+      })
+
+      resolve({
+        kill: () => {
+          console.log('killing current process', currentProcess)
+          killed = true;
+          currentProcess.kill()
+        },
+        replace: (newSound) => {
+          killed = true
+          currentProcess.kill();
+          return self._insertOnStart(newSound.constructor == Array ? newSound : [newSound])
+        },
+        endPromise,
+      })
+    } else {
+      console.log('playing next: empty queue or player in use')
+    }
+  }
+  setVolume(vol) {
+    this.volume = vol;
+    return new Promise((resolve, reject) => {
+      const setVol = exec(`amixer -c 1 set Speaker ${vol}% -M`)
+      setVol.on('exit', () => {
+        resolve()
+      })
+    })
+  }
+  getVolume() {
+    return this.volume
+  }
+  play(sound) {
+    return this._addToQueue(sound.constructor == Array ? sound : [sound])
+  }
 
 }
 module.exports = {
-	SoundPlayer : new SoundPlayer()
+  SoundPlayer: new SoundPlayer()
 }

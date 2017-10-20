@@ -4,6 +4,7 @@ function WS(ws) {
     const module = {};
     module.get = () => _ws;
     module.sendJSON = (object) => {
+        console.log("sending json", object)
         if (module.isOpen())
             _ws.send(JSON.stringify(object))
     }

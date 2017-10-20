@@ -11,7 +11,7 @@ module.exports = {
     target: 'web',
     cache: true,
     entry: {
-        module: path.join(srcPath, 'index.js'),
+        module: ['babel-polyfill', path.join(srcPath, 'index.js')],
         common: [
             'react', 
             'react-dom', 
@@ -58,10 +58,11 @@ module.exports = {
             loader: ExtractTextPlugin.extract('style-loader', 'css-loader!sass-loader')
         }, {
             test: /\.js(|x)$/,
-            loader: 'babel-loader',
+            loader: 'babel',
             exclude: [/node_modules/, "bootstrap-sass.config.js"],
             query: {
-                presets: ['es2015', "stage-0", 'react']
+                presets: ['es2015', "stage-0", 'react'],
+                plugins: ["transform-async-to-generator"]
             }
         },{
             test: /\.(jpe?g|png|gif|svg)$/,

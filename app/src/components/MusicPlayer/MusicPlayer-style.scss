@@ -1,0 +1,48 @@
+.MusicPlayer {
+	//position: absolute;
+	bottom: 0px;
+	height: 85vh;
+	width: 100vw;
+	.playlistsContainer {
+		height : 65vh;
+		display: flex;
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+	.bottomPanel {
+		height: 19vh;
+		.songName {
+			text-align: center;
+		}
+		.buttons {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+			button {
+				background-color: transparent;
+				padding: 8px;
+				font-size: 1.0rem;
+				margin: 10px;
+				width: 40px;
+				height: 40px;
+				border-radius: 50%;
+				border: 1px solid black;
+				&.selected {
+					color: coral;
+				}
+				transition: border-color 0.3s ease, transform 0.2s ease;
+				&:hover, &:active {
+					border: 1px solid coral;
+					cursor: pointer;
+					i {
+						color: coral;
+					}
+				}
+				i {
+					transition: color 0.3s ease;
+				}
+			}
+		}
+	}
+}
