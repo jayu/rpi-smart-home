@@ -15,12 +15,33 @@ export const setPlaybackState = (state) => ({
 	type : actionTypes.SET_PLAYBACK_STATE,
 	state
 })
+export const setShuffle = (shuffle) => ({
+	type : actionTypes.SET_SHUFFLE,
+	shuffle
+})
+export const setRepeat = (repeat) => ({
+	type : actionTypes.SET_REPEAT,
+	repeat
+})
+export const setVolume = (volume) => ({
+	type : actionTypes.SET_VOLUME,
+	volume
+})
 
 /* Async actions */
 export const getMusicInfo = () => async (dispatch, getState) => {
 	const musicInfo = await axios.get(`http://${location.host}/api/musicPlayer/musicInfo`)
 	dispatch(setPlaylistsInfo(musicInfo.data.playlists))
 
+}
+export const getPlayerSetup = () => async (dispatch, getState) => {
+	const palyerState = await axios.get(`http://${location.host}/api/musicPlayer/setup`)
+	console.log('has music player state', palyerState)
+	dispatch(setVolume(palyerState.data.volume))
+	dispatch(setShuffle(palyerState.data.shuffle))
+	dispatch(setRepeat(palyerState.data.repeat))
+	dispatch(setPlaybackState(palyerState.data.playbackState))
+	dispatch(setCurrentSong(palyerState.data.songName))
 }
 export const playSong = (playlist, songName) => async (dispatch, getState) => {
 	console.log(playlist, songName)
@@ -30,6 +51,7 @@ export const playSong = (playlist, songName) => async (dispatch, getState) => {
 		songName,
 	})
 	dispatch(setCurrentSong(songName))
+	dispatch(setPlaybackState("playing"))
 }
 export const playPlaylist = (playlist) => async (dispatch, getState) => {
 	const url = `http://${location.host}/api/musicPlayer/play`
@@ -37,6 +59,8 @@ export const playPlaylist = (playlist) => async (dispatch, getState) => {
 		playlist,
 	})
 	dispatch(setCurrentSong(songName))
+	dispatch(setPlaybackState("playing"))
+
 }
 export const pausePlayback = () => async (dispatch, getState) => {
 	const url = `http://${location.host}/api/musicPlayer/pause`

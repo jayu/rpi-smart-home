@@ -1,29 +1,35 @@
 import * as types from '../actions/action-types'
 
 const initialState = {
-	currentSongTitle : "Test songs",
+	currentSongTitle : "",
 	currentPlaylist : "",
 	playlists : [],
 	shuffle : false,
 	random : false,
-	volume : .5,// 0-1	
+	volume : 50,// 0-100	
 	playbackState : "paused", //"playing, paused"
 	playStartTime : null,
 	songStartedAt : 0, //
 }
 const musicPlayerReducer = (state = initialState, action) => {
-	console.log('musicPlayerReducer')
 	switch (action.type) {
 		case types.SET_PLAYLISTS: {
 			return {...state, playlists : action.playlists}
 		}
 		case types.SET_CURRENT_SONG: {
-			console.log('setting currentSong')
-			return {...state, currentSongTitle : action.songName, playbackState : 'playing'}
+			return {...state, currentSongTitle : action.songName}
 		}
 		case types.SET_PLAYBACK_STATE: {
-			console.log('setting SET_PLAYBACK_PAUSE')
 			return {...state, playbackState : action.state}
+		}
+		case types.SET_VOLUME: {
+			return {...state, volume : action.volume}
+		}
+		case types.SET_SHUFFLE: {
+			return {...state, shuffle : action.shuffle}
+		}
+		case types.SET_REPEAT: {
+			return {...state, repeat : action.repeat}
 		}
 		default : {
 			return state

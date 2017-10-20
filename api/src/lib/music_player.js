@@ -13,7 +13,11 @@ const { WS, filterInactiveClients, websocketClients, sendToAll } = require('../w
   - stop current playlis when changes check it
 */
 
-
+const playbackState = {
+  playing : "playing",
+  paused : "paused",
+  stopped : "stopped"
+}
 class MusicPlayer {
   constructor(sourceDir) {
     //this.soundPlayer = soundPlayer;
@@ -23,9 +27,10 @@ class MusicPlayer {
     this.currentQueueIndex = 0;
     this.currentSoundStart = 0;
     this.currentSoundPausedAt = 0;
-    this.currentSound = {};
+    this.currentSound = null;
     this.shuffle = true;
     this.repeat = true //false;
+    this.playbackState = playbackState.stopped
     this.getFileInfoTaskQueue = new TaskQueue((songPath) => {
       return new Promise((resolve, reject) => {
         if (require('os').userInfo().username != "ASUS") {
@@ -159,6 +164,7 @@ class MusicPlayer {
       }
 
       if (this.queue.length > 0) {
+        this.playbackState = playbackState.playing
         this._playQueue();
       }
 
@@ -166,18 +172,27 @@ class MusicPlayer {
   }
   pause() { 
     this.currentSoundPausedAt = this.currentSoundPausedAt + Date.now() - this.currentSoundStart // previous paused + interval
-    this.stop()
+    this.stop(true)
   }
   resume() {
-    const song = [this.queue[this.currentQueueIndex].path, 'trim', ~~(this.currentSoundPausedAt/1000)]
-    SoundPlayer.play(song)
-      .then(this._setCurrentSound.bind(this))
-      .then(this._playbackEnd.bind(this))
+    if (this.queue.length) {
+      const song = [this.queue[this.currentQueueIndex].path, 'trim', ~~(this.currentSoundPausedAt/1000)]
+      SoundPlayer.play(song)
+        .then(this._setCurrentSound.bind(this))
+        .then(this._playbackEnd.bind(this))
+    }
   }
-  stop() { //kill current song
+  stop(pause = false) { //kill current song
     console.log('killing current song', this.currentSound)
-    if (this.currentSound.kill) {
+    if (this.currentSound != null) {
       this.currentSound.kill();
+      if (!pause) {
+        this.currentSound = null;
+        this.playbackState = playbackState.stopped
+      }
+      else {
+        this.playbackState = playbackState.paused
+      }
     }
   }
   next() {
@@ -200,6 +215,9 @@ class MusicPlayer {
   }
   setVolume(volume) {
     return SoundPlayer.setVolume(volume)
+  }
+  getVolume() {
+    return SoundPlayer.getVolume()
   }
 }
 module.exports = MusicPlayer;

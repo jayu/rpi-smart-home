@@ -18,6 +18,9 @@ export const SET_TEMPERATURE_LIST = 'SET_TEMPERATURE_LIST'
 
 /* music player actions */
 
-export const SET_PLAYLISTS = 'SET_PLAYLISTS'
-export const SET_CURRENT_SONG = 'SET_CURRENT_SONG'
-export const SET_PLAYBACK_STATE = 'SET_PLAYBACK_STATE'
+export const SET_PLAYLISTS 				= 'SET_PLAYLISTS'
+export const SET_CURRENT_SONG 		= 'SET_CURRENT_SONG'
+export const SET_PLAYBACK_STATE 	= 'SET_PLAYBACK_STATE'
+export const SET_VOLUME 					= 'SET_VOLUME'
+export const SET_SHUFFLE 					= 'SET_SHUFFLE'
+export const SET_REPEAT 					= 'SET_REPEAT'	

@@ -41098,6 +41098,7 @@ var Example = Example || {}; Example["module"] =
 	store.dispatch((0, _setupActions.getInitialState)());
 	store.dispatch((0, _temperatureActions.getTemperatureList)());
 	store.dispatch((0, _musicPlayerActions.getMusicInfo)());
+	store.dispatch((0, _musicPlayerActions.getPlayerSetup)());
 
 	exports.default = store;
 
@@ -41122,7 +41123,6 @@ var Example = Example || {}; Example["module"] =
 	  socket.onmessage = function (msg) {
 	    console.log(msg);
 	    msg = JSON.parse(msg.data);
-	    console.log(store.dispatch);
 	    store.dispatch(webSocketActions.socketReceive(msg));
 	  };
 	};
@@ -41185,7 +41185,7 @@ var Example = Example || {}; Example["module"] =
 		return function (dispatch, getState) {
 
 			var url = 'http://' + location.host + '/api/setup'; // TODO export hostname etc.
-			console.log('getting initial state');
+
 			_axios2.default.get(url).then(function (response) {
 				var pins = response.data.pins;
 				Object.keys(pins).forEach(function (key) {
@@ -41274,6 +41274,9 @@ var Example = Example || {}; Example["module"] =
 	var SET_PLAYLISTS = exports.SET_PLAYLISTS = 'SET_PLAYLISTS';
 	var SET_CURRENT_SONG = exports.SET_CURRENT_SONG = 'SET_CURRENT_SONG';
 	var SET_PLAYBACK_STATE = exports.SET_PLAYBACK_STATE = 'SET_PLAYBACK_STATE';
+	var SET_VOLUME = exports.SET_VOLUME = 'SET_VOLUME';
+	var SET_SHUFFLE = exports.SET_SHUFFLE = 'SET_SHUFFLE';
+	var SET_REPEAT = exports.SET_REPEAT = 'SET_REPEAT';
 
 /***/ },
 /* 646 */
@@ -41417,12 +41420,12 @@ var Example = Example || {}; Example["module"] =
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	var initialState = {
-		currentSongTitle: "Test songs",
+		currentSongTitle: "",
 		currentPlaylist: "",
 		playlists: [],
 		shuffle: false,
 		random: false,
-		volume: .5, // 0-1	
+		volume: 50, // 0-100	
 		playbackState: "paused", //"playing, paused"
 		playStartTime: null,
 		songStartedAt: 0 };
@@ -41430,7 +41433,6 @@ var Example = Example || {}; Example["module"] =
 		var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
 		var action = arguments[1];
 
-		console.log('musicPlayerReducer');
 		switch (action.type) {
 			case types.SET_PLAYLISTS:
 				{
@@ -41438,13 +41440,23 @@ var Example = Example || {}; Example["module"] =
 				}
 			case types.SET_CURRENT_SONG:
 				{
-					console.log('setting currentSong');
-					return _extends({}, state, { currentSongTitle: action.songName, playbackState: 'playing' });
+					return _extends({}, state, { currentSongTitle: action.songName });
 				}
 			case types.SET_PLAYBACK_STATE:
 				{
-					console.log('setting SET_PLAYBACK_PAUSE');
 					return _extends({}, state, { playbackState: action.state });
+				}
+			case types.SET_VOLUME:
+				{
+					return _extends({}, state, { volume: action.volume });
+				}
+			case types.SET_SHUFFLE:
+				{
+					return _extends({}, state, { shuffle: action.shuffle });
+				}
+			case types.SET_REPEAT:
+				{
+					return _extends({}, state, { repeat: action.repeat });
 				}
 			default:
 				{
@@ -41520,7 +41532,7 @@ var Example = Example || {}; Example["module"] =
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.resumePlayback = exports.pausePlayback = exports.playPlaylist = exports.playSong = exports.getMusicInfo = exports.setPlaybackState = exports.setCurrentSong = exports.setPlaylistsInfo = undefined;
+	exports.resumePlayback = exports.pausePlayback = exports.playPlaylist = exports.playSong = exports.getPlayerSetup = exports.getMusicInfo = exports.setVolume = exports.setRepeat = exports.setShuffle = exports.setPlaybackState = exports.setCurrentSong = exports.setPlaylistsInfo = undefined;
 
 	var _axios = __webpack_require__(613);
 
@@ -41556,6 +41568,24 @@ var Example = Example || {}; Example["module"] =
 			state: state
 		};
 	};
+	var setShuffle = exports.setShuffle = function setShuffle(shuffle) {
+		return {
+			type: actionTypes.SET_SHUFFLE,
+			shuffle: shuffle
+		};
+	};
+	var setRepeat = exports.setRepeat = function setRepeat(repeat) {
+		return {
+			type: actionTypes.SET_REPEAT,
+			repeat: repeat
+		};
+	};
+	var setVolume = exports.setVolume = function setVolume(volume) {
+		return {
+			type: actionTypes.SET_VOLUME,
+			volume: volume
+		};
+	};
 
 	/* Async actions */
 	var getMusicInfo = exports.getMusicInfo = function getMusicInfo() {
@@ -41587,26 +41617,28 @@ var Example = Example || {}; Example["module"] =
 			};
 		}();
 	};
-	var playSong = exports.playSong = function playSong(playlist, songName) {
+	var getPlayerSetup = exports.getPlayerSetup = function getPlayerSetup() {
 		return function () {
 			var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(dispatch, getState) {
-				var url;
+				var palyerState;
 				return regeneratorRuntime.wrap(function _callee2$(_context2) {
 					while (1) {
 						switch (_context2.prev = _context2.next) {
 							case 0:
-								console.log(playlist, songName);
-								url = 'http://' + location.host + '/api/musicPlayer/play';
-								_context2.next = 4;
-								return _axios2.default.post(url, {
-									playlist: playlist,
-									songName: songName
-								});
+								_context2.next = 2;
+								return _axios2.default.get('http://' + location.host + '/api/musicPlayer/setup');
 
-							case 4:
-								dispatch(setCurrentSong(songName));
+							case 2:
+								palyerState = _context2.sent;
 
-							case 5:
+								console.log('has music player state', palyerState);
+								dispatch(setVolume(palyerState.data.volume));
+								dispatch(setShuffle(palyerState.data.shuffle));
+								dispatch(setRepeat(palyerState.data.repeat));
+								dispatch(setPlaybackState(palyerState.data.playbackState));
+								dispatch(setCurrentSong(palyerState.data.songName));
+
+							case 9:
 							case 'end':
 								return _context2.stop();
 						}
@@ -41619,7 +41651,7 @@ var Example = Example || {}; Example["module"] =
 			};
 		}();
 	};
-	var playPlaylist = exports.playPlaylist = function playPlaylist(playlist) {
+	var playSong = exports.playSong = function playSong(playlist, songName) {
 		return function () {
 			var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(dispatch, getState) {
 				var url;
@@ -41627,16 +41659,19 @@ var Example = Example || {}; Example["module"] =
 					while (1) {
 						switch (_context3.prev = _context3.next) {
 							case 0:
+								console.log(playlist, songName);
 								url = 'http://' + location.host + '/api/musicPlayer/play';
-								_context3.next = 3;
+								_context3.next = 4;
 								return _axios2.default.post(url, {
-									playlist: playlist
+									playlist: playlist,
+									songName: songName
 								});
 
-							case 3:
-								dispatch(setCurrentSong(songName));
-
 							case 4:
+								dispatch(setCurrentSong(songName));
+								dispatch(setPlaybackState("playing"));
+
+							case 6:
 							case 'end':
 								return _context3.stop();
 						}
@@ -41649,7 +41684,7 @@ var Example = Example || {}; Example["module"] =
 			};
 		}();
 	};
-	var pausePlayback = exports.pausePlayback = function pausePlayback() {
+	var playPlaylist = exports.playPlaylist = function playPlaylist(playlist) {
 		return function () {
 			var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(dispatch, getState) {
 				var url;
@@ -41657,14 +41692,17 @@ var Example = Example || {}; Example["module"] =
 					while (1) {
 						switch (_context4.prev = _context4.next) {
 							case 0:
-								url = 'http://' + location.host + '/api/musicPlayer/pause';
+								url = 'http://' + location.host + '/api/musicPlayer/play';
 								_context4.next = 3;
-								return _axios2.default.post(url);
+								return _axios2.default.post(url, {
+									playlist: playlist
+								});
 
 							case 3:
-								dispatch(setPlaybackState('paused'));
+								dispatch(setCurrentSong(songName));
+								dispatch(setPlaybackState("playing"));
 
-							case 4:
+							case 5:
 							case 'end':
 								return _context4.stop();
 						}
@@ -41677,7 +41715,7 @@ var Example = Example || {}; Example["module"] =
 			};
 		}();
 	};
-	var resumePlayback = exports.resumePlayback = function resumePlayback() {
+	var pausePlayback = exports.pausePlayback = function pausePlayback() {
 		return function () {
 			var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(dispatch, getState) {
 				var url;
@@ -41685,12 +41723,12 @@ var Example = Example || {}; Example["module"] =
 					while (1) {
 						switch (_context5.prev = _context5.next) {
 							case 0:
-								url = 'http://' + location.host + '/api/musicPlayer/resume';
+								url = 'http://' + location.host + '/api/musicPlayer/pause';
 								_context5.next = 3;
 								return _axios2.default.post(url);
 
 							case 3:
-								dispatch(setPlaybackState('playing'));
+								dispatch(setPlaybackState('paused'));
 
 							case 4:
 							case 'end':
@@ -41702,6 +41740,34 @@ var Example = Example || {}; Example["module"] =
 
 			return function (_x9, _x10) {
 				return _ref5.apply(this, arguments);
+			};
+		}();
+	};
+	var resumePlayback = exports.resumePlayback = function resumePlayback() {
+		return function () {
+			var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(dispatch, getState) {
+				var url;
+				return regeneratorRuntime.wrap(function _callee6$(_context6) {
+					while (1) {
+						switch (_context6.prev = _context6.next) {
+							case 0:
+								url = 'http://' + location.host + '/api/musicPlayer/resume';
+								_context6.next = 3;
+								return _axios2.default.post(url);
+
+							case 3:
+								dispatch(setPlaybackState('playing'));
+
+							case 4:
+							case 'end':
+								return _context6.stop();
+						}
+					}
+				}, _callee6, undefined);
+			}));
+
+			return function (_x11, _x12) {
+				return _ref6.apply(this, arguments);
 			};
 		}();
 	};
@@ -76363,7 +76429,7 @@ var Example = Example || {}; Example["module"] =
 
 	var MusicPlayerView = function MusicPlayerView(props) {
 	  var playPauseBtn = props.playbackState == 'playing' ? "pause" : "play";
-	  var playPauseBtnAction = props.playbackState == 'playing' ? props.pause : props.resume;
+	  var playPauseBtnAction = props.playbackState == 'playing' ? props.pause : props.playbackState == "paused" ? props.resume : null;
 	  console.log(props.playbackState, playPauseBtnAction);
 	  return _react2.default.createElement(
 	    'div',
@@ -76382,7 +76448,7 @@ var Example = Example || {}; Example["module"] =
 	        { className: 'buttons' },
 	        _react2.default.createElement(
 	          'button',
-	          null,
+	          { style: props.shuffle ? { backgroundColor: 'red' } : null },
 	          '\u2928'
 	        ),
 	        _react2.default.createElement(
@@ -76392,7 +76458,7 @@ var Example = Example || {}; Example["module"] =
 	        ),
 	        _react2.default.createElement(
 	          'button',
-	          { onClick: playPauseBtnAction },
+	          { onClick: playPauseBtnAction, disabled: playPauseBtnAction == null },
 	          playPauseBtn
 	        ),
 	        _react2.default.createElement(
@@ -76402,7 +76468,7 @@ var Example = Example || {}; Example["module"] =
 	        ),
 	        _react2.default.createElement(
 	          'button',
-	          null,
+	          { style: props.repeat ? { backgroundColor: 'red' } : null },
 	          '\u21BB'
 	        )
 	      )

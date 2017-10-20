@@ -66,5 +66,14 @@ module.exports = () => {
   musicPlayer.get('/musicInfo', (req, res) => {
     res.json(music_player.musicInfo)
   })
+  musicPlayer.get('/setup', (req, res) => {
+    res.json({
+      volume : music_player.getVolume(),
+      shuffle : music_player.shuffle,
+      repeat : music_player.repeat,
+      songName : music_player.currentSound != null ? this.queue[this.currentQueueIndex].name : "",
+      playbackState : music_player.playbackState
+    })
+  })
   return musicPlayer;
 };

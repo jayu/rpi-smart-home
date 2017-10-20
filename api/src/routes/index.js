@@ -8,11 +8,11 @@ const { WS, filterInactiveClients, websocketClients, sendToAll } = require('../w
 const gpio = require('../gpio')
 const { parseBoolean } = require('../utils')
 const { play, getTemp, monitorTemp } = require('../play_temperature')
-const MusicPlayer = require('../lib/music_player.js')
+//const MusicPlayer = require('../lib/music_player.js')
 
 const { downloadFromYoutube, updateSpotifySongs } = require('../lib/youtubify.js')
 
-const music_player = new MusicPlayer(path.join(__dirname, "../res/music"));
+//const music_player = new MusicPlayer(path.join(__dirname, "../res/music"));
 monitorTemp()
 setInterval(monitorTemp, 29 * 60 * 1000)
 

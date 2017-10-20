@@ -3,7 +3,7 @@ import PlaylistsList from '../MusicPlayer-playlistsList/MusicPlayer-playlistsLis
 
 const MusicPlayerView = (props) => {
   const playPauseBtn = props.playbackState == 'playing' ? "pause" :  "play"
-  const playPauseBtnAction = props.playbackState == 'playing' ? props.pause : props.resume
+  const playPauseBtnAction = props.playbackState == 'playing' ? props.pause : props.playbackState == "paused" ? props.resume : null
   console.log(props.playbackState, playPauseBtnAction)
 	return (
     <div className="MusicPlayer">        
@@ -11,11 +11,11 @@ const MusicPlayerView = (props) => {
       <div className="bottomPanel">
         <p>{props.currentSongTitle}</p>
         <div className="buttons">
-          <button>&#10536;</button>
+          <button style={props.shuffle ? {backgroundColor : 'red'} : null}>&#10536;</button>
           <button>&lt;</button>
-          <button onClick={playPauseBtnAction}>{playPauseBtn}</button>
+          <button onClick={playPauseBtnAction} disabled={playPauseBtnAction==null}>{playPauseBtn}</button>
           <button>&gt;</button>
-          <button>&#8635;</button>
+          <button style={props.repeat ? {backgroundColor : 'red'} : null}>&#8635;</button>
         </div>
       </div>
     </div>

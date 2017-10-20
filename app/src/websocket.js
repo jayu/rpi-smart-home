@@ -13,7 +13,6 @@ export default function (store) {
   socket.onmessage = function(msg){
     console.log(msg);
     msg = JSON.parse(msg.data);
-    console.log(store.dispatch);
     store.dispatch(webSocketActions.socketReceive(msg));
   };
 }
