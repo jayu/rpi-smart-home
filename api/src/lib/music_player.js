@@ -102,7 +102,7 @@ class MusicPlayer {
       'Afternoon Train Ride',
       'Emotron',
       //'deep Chill',
-      'kartka',
+      //'kartka',
       'Reading Soundtrack',
       'car rollin',
       'russ Hip-Hop',
