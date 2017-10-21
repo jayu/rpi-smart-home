@@ -22,7 +22,7 @@ function monitorTemp() {
 	const newTemp = {}
 	Object.keys(temperature).forEach((key) => {
 		if (Date.now() - key < 7 * 24 * 60 * 60 * 1000) {
-			newTemp[key] = temp[key]
+			newTemp[key] = temperature[key]
 		}
 	})
 	getTemp().then((temp) => {
