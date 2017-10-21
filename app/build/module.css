@@ -34,7 +34,7 @@ label.checkbox {
   width: 30px;
   height: 20px;
   border-radius: 10px;
-  border: 1px solid orange;
+  border: 1px solid coral;
   box-sizing: initial;
   margin: 0;
   transition: border 0.3s ease-in-out;
@@ -75,7 +75,7 @@ input[type="checkbox"] + span {
 
 input[type="checkbox"]:checked ~ .checkbox .switch {
   right: 0px;
-  background-color: orange; }
+  background-color: coral; }
 .Temperature {
   display: flex;
   flex-direction: column;

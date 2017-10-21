@@ -19,10 +19,16 @@ function monitorTemp() {
 		temperature = JSON.parse(fs.readFileSync(filepath));
 	}
 	//console.log(temperature);
+	const newTemp = {}
+	Object.keys(temperature).forEach((key) => {
+		if (Date.now() - key < 7 * 24 * 60 * 60 * 1000) {
+			newTemp[key] = temp[key]
+		}
+	})
 	getTemp().then((temp) => {
 		console.log(temp)
-		temperature[Date.now()] = temp;
-		const tempString = JSON.stringify(temperature);
+		newTemp[Date.now()] = temp;
+		const tempString = JSON.stringify(newTemp);
 		//console.log(filepath);
 		const writeRes = fs.writeFileSync(filepath, tempString)
 		//console.log(tempString, writeRes)
