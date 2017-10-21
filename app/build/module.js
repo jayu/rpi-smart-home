@@ -42045,7 +42045,7 @@ var Example = Example || {}; Example["module"] =
 	         return _react2.default.createElement(
 	            _CheckBoxView2.default,
 	            { checked: value, key: index, onChange: props.changeSocketState(index) },
-	            'Socket' + (index + 1)
+	            'Socket ' + (index + 1)
 	         );
 	      })
 	   );
@@ -42186,16 +42186,22 @@ var Example = Example || {}; Example["module"] =
 	      return new Date(parseInt(label)).toLocaleTimeString();
 	    }),
 	    datasets: [{
-	      label: "Population (millions)",
+	      label: "Temperature",
 	      //backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
-	      data: dataArr
+	      data: dataArr,
+	      backgroundColor: "rgba(255, 127, 80, 0.39)",
+	      borderColor: "rgba(255, 127, 80, 0.8)",
+	      pointBorderColor: "coral",
+	      pointBackgroundColor: "#fff",
+	      pointBorderWidth: 2,
+	      pointHoverRadius: 5
 	    }]
 	  };
 	  var options = {
 	    legend: { display: false },
 	    title: {
 	      display: true,
-	      text: 'Predicted world population (millions) in 2050'
+	      text: 'Temperature history'
 	    }
 	  };
 	  return _react2.default.createElement(

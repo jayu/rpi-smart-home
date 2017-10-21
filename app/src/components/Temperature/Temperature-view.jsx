@@ -13,9 +13,15 @@ const TemperatureView = (props) => {
       labels: Object.keys(props.temperatureList).map((label) => ((new Date(parseInt(label))).toLocaleTimeString())),
       datasets: [
         {
-          label: "Population (millions)",
+          label: "Temperature",
           //backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
-          data: dataArr
+          data: dataArr,
+          backgroundColor : "rgba(255, 127, 80, 0.39)",
+          borderColor : "rgba(255, 127, 80, 0.8)",
+          pointBorderColor: "coral",
+          pointBackgroundColor: "#fff",
+          pointBorderWidth: 2,
+          pointHoverRadius: 5,
         }
       ]
     }
@@ -23,7 +29,7 @@ const TemperatureView = (props) => {
       legend: { display: false },
       title: {
         display: true,
-        text: 'Predicted world population (millions) in 2050'
+        text: 'Temperature history'
       }
     }
 	return (
