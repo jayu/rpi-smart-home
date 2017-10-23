@@ -224,7 +224,7 @@ const updateSpotifySongs = (userId, ommitPlaylists, outDir) => {
         Object.keys(playlistsTracksToDownload).forEach((playlistName) => {
           playlistsTracksToDownload[playlistName].forEach(({ desiredTitle, id }) => {
             const tempDirectory = path.join(outDir, `temp_${playlistName}`)
-            const tempFilePath = path.join(tempDirectory, desiredTitle.replaceAll("[\\\\/:*?\"<>|]", "_"))
+            const tempFilePath = path.join(tempDirectory, desiredTitle.replace(/\/|\|\>\?\>/g, "_"))
             if (!fs.existsSync(tempDirectory)) {
               fs.mkdirSync(tempDirectory);
             }
