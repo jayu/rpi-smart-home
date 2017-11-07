@@ -5,7 +5,7 @@ const fake_gpio = {
 	DIR_IN : true,
 	DIR_OUT : true
 }
-const gpio = require('os').userInfo().username == "root" ? fake_gpio : require('rpi-gpio');
+const gpio = require('os').userInfo().username == "j" ? fake_gpio : require('rpi-gpio');
 
 const state = [];
 const pins = {
