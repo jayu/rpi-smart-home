@@ -36,7 +36,7 @@ class MusicPlayer {
     this.playbackState = playbackState.stopped
     this.getFileInfoTaskQueue = new TaskQueue((songPath) => {
       return new Promise((resolve, reject) => {
-        if (require('os').userInfo().username != "ASUS") {
+        if (require('os').userInfo().username != "root") {
           mp3Length(songPath, (err,duration) => {
             console.log(songPath, err, duration)
             resolve(duration)

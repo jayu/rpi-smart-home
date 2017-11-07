@@ -8,6 +8,7 @@ const { WS, filterInactiveClients, websocketClients, sendToAll } = require('../w
 const gpio = require('../gpio')
 const { parseBoolean } = require('../utils')
 const { play, getTemp, monitorTemp } = require('../play_temperature')
+const doorman = require('../lib/doorman.js')
 //const MusicPlayer = require('../lib/music_player.js')
 
 const { downloadFromYoutube, updateSpotifySongs } = require('../lib/youtubify.js')
@@ -107,6 +108,12 @@ module.exports = () => {
         });
       })
   });
+  api.post('/opendoor', (req, res) => {
+    doorman.open().then((response) => {
+      console.log(response)
+      res.json({success : true})
+    })
+  })
   api.get('/setup', function(req, res) {
     const pins = {};
     Object.keys(gpio._pins.write).forEach((pinName) => {
