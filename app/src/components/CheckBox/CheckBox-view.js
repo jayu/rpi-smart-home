@@ -1,5 +1,5 @@
 import React from "react";
-require("./Checkbox-style.scss")
+require("./CheckBox-style.scss")
 
 export default React.createClass({
 

@@ -76,6 +76,11 @@ input[type="checkbox"] + span {
 input[type="checkbox"]:checked ~ .checkbox .switch {
   right: 0px;
   background-color: coral; }
+.Sockets button {
+  padding: 15px;
+  font-size: 1.2rem;
+  margin: 10px;
+  width: 140px; }
 .Temperature {
   display: flex;
   flex-direction: column;
